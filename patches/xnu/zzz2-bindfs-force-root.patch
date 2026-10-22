@@ -1,0 +1,18 @@
+From: UniXNU kebab bring-up
+Subject: [PATCH] bindfs: define BINDM_FORCE_ROOT
+
+zzy-native-gpu-addon-mount.patch uses BINDM_FORCE_ROOT in bind_vfsops.c but
+the hunk that defines it in bindfs.h is missing from this revision, so the
+kernel fails to build with "use of undeclared identifier 'BINDM_FORCE_ROOT'".
+
+Define the flag exactly as the companion patch expects.
+---
+diff --git a/bsd/miscfs/bindfs/bindfs.h b/bsd/miscfs/bindfs/bindfs.h
+--- a/bsd/miscfs/bindfs/bindfs.h
++++ b/bsd/miscfs/bindfs/bindfs.h
+@@ -81,4 +81,5 @@
+ //#define BINDFS_DEBUG 0
+ 
+ #define BINDM_CACHE 0x0001
++#define BINDM_FORCE_ROOT 0x80000000ULL
+ #define BINDM_CASEINSENSITIVE 0x0000000000000002
