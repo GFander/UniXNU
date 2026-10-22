@@ -181,6 +181,15 @@ jobs:
           if [ "$SKIP_SETUP" = "true" ]; then args+=(--skip-setup); fi
           ./unixnu build payload "${args[@]}"
 
+      - name: Upload logs on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unixnu-logs-${{ inputs.defconfig }}
+          path: out/*/logs/**
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Upload kernel and payload
         uses: actions/upload-artifact@v4
         with:
