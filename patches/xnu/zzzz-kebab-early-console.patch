@@ -2,7 +2,7 @@ diff --git a/osfmk/arm64/kebab_early.c b/osfmk/arm64/kebab_early.c
 new file mode 100644
 --- /dev/null
 +++ b/osfmk/arm64/kebab_early.c
-@@ -0,0 +1,130 @@
+@@ -0,0 +1,135 @@
 +/*
 + * OnePlus 10 Pro 5G bootstrap console. No allocation, locks, ADT parsing or
 + * per-CPU state: panic() can reach this before a current thread exists.
@@ -107,6 +107,11 @@ new file mode 100644
 +	kebab_early_string(": ");
 +	kebab_early_string(label);
 +	kebab_early_putc('\n');
++	/* self-disable: stage 7 is the last mark before arm_vm_init replaces TTBR0,
++	 * so no separate hook is needed in arm_vm_init.c. */
++	if (stage >= 7) {
++		early_disabled = 1;
++	}
 +}
 +
 +void
@@ -172,15 +177,7 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  	arm_setup_pre_sign();
  
  	arm_slide_rebase_and_sign_image();
-@@ -371,6 +373,7 @@
- #endif /* defined(HAS_APPLE_PAC) */
- 
- 	PE_init_platform(FALSE, args); /* Get platform expert set up */
-+	kebab_early_mark(2, "PE_init_platform done");
- 	boot_progress_init();
- 
- #if __arm64__
-@@ -443,6 +446,7 @@
+@@ -443,6 +445,7 @@
  #endif
  
  	ml_parse_cpu_topology();
@@ -188,7 +185,7 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  
  
  	master_cpu = ml_get_boot_cpu_number();
-@@ -472,11 +476,13 @@
+@@ -472,11 +475,13 @@
  	 */
  	thread->machine.preemption_count = 0;
  	cpu_bootstrap();
@@ -202,7 +199,7 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  
  	/*
  	 * Initialize the timer callout world
-@@ -484,6 +490,8 @@
+@@ -484,6 +489,8 @@
  	timer_call_init();
  
  	cpu_init();
@@ -211,7 +208,7 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  	processor_bootstrap();
  
  	if (PE_parse_boot_argn("maxmem", &maxmem, sizeof(maxmem))) {
-@@ -532,6 +540,7 @@
+@@ -532,6 +539,7 @@
  #endif  /* __ARM_PAN_AVAILABLE__ */
  
  	boot_progress_stage("arm_vm_init enter");
@@ -219,17 +216,6 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  	arm_vm_init(xmaxmem, args);
  	boot_progress_stage("arm_vm_init returned");
  
-diff --git a/osfmk/arm64/arm_vm_init.c b/osfmk/arm64/arm_vm_init.c
---- a/osfmk/arm64/arm_vm_init.c
-+++ b/osfmk/arm64/arm_vm_init.c
-@@ -2156,6 +2156,7 @@
- #endif
- 
- 	/* The framebuffer VA=PA mapping belongs to the outgoing TTBR0. */
-+	kebab_early_disable();
- 	set_mmu_ttb(invalid_ttep & TTBR_BADDR_MASK);
- 
- 	flush_mmu_tlb();
 diff --git a/osfmk/arm64/start.s b/osfmk/arm64/start.s
 --- a/osfmk/arm64/start.s
 +++ b/osfmk/arm64/start.s
