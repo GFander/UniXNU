@@ -168,16 +168,15 @@ new file mode 100644
 diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
 --- a/osfmk/arm/arm_init.c
 +++ b/osfmk/arm/arm_init.c
-@@ -355,6 +355,8 @@
- 	DTEntry chosen = NULL;
- 	unsigned int dt_entry_size = 0;
- 
+@@ -220,6 +220,7 @@
+ static void
+ arm_slide_rebase_and_sign_image(void)
+ {
 +	kebab_early_mark(1, "arm_init entered (MMU on)");
-+
- 	arm_setup_pre_sign();
- 
- 	arm_slide_rebase_and_sign_image();
-@@ -443,6 +445,7 @@
+ 	kernel_mach_header_t *k_mh, *kc_mh = NULL;
+ 	kernel_segment_command_t *seg;
+ 	uintptr_t slide;
+@@ -442,6 +443,7 @@
  #endif
  
  	ml_parse_cpu_topology();
@@ -185,7 +184,7 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  
  
  	master_cpu = ml_get_boot_cpu_number();
-@@ -472,11 +475,13 @@
+@@ -471,11 +473,13 @@
  	 */
  	thread->machine.preemption_count = 0;
  	cpu_bootstrap();
@@ -199,16 +198,15 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  
  	/*
  	 * Initialize the timer callout world
-@@ -484,6 +489,8 @@
+@@ -483,6 +487,7 @@
  	timer_call_init();
  
  	cpu_init();
-+
 +	kebab_early_mark(6, "cpu_init done");
+ 
  	processor_bootstrap();
  
- 	if (PE_parse_boot_argn("maxmem", &maxmem, sizeof(maxmem))) {
-@@ -532,6 +539,7 @@
+@@ -532,6 +537,7 @@
  #endif  /* __ARM_PAN_AVAILABLE__ */
  
  	boot_progress_stage("arm_vm_init enter");
@@ -219,31 +217,53 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
 diff --git a/osfmk/arm64/start.s b/osfmk/arm64/start.s
 --- a/osfmk/arm64/start.s
 +++ b/osfmk/arm64/start.s
-@@ -471,6 +471,24 @@
+@@ -470,6 +470,24 @@
+ 
  	mov		x20, x0
- 	mov		x21, #0
  
 +#if 1 /* kebab early console */
 +	/* Stage 0: white 64x32 band, no stack or page tables needed. */
 +	MOV64	x0, (0x9c000000 + 2368 * 4320)
-+	mov		w1, #-1
-+	mov		x2, #32
-+	mov		x4, #4320
++	mov	w1, #-1
++	mov	x2, #32
++	mov	x4, #4320
 +Lkebab_mark_row:
-+	mov		x3, #64
-+	mov		x5, x0
++	mov	x3, #64
++	mov	x5, x0
 +Lkebab_mark_pixel:
-+	str		w1, [x5], #4
++	str	w1, [x5], #4
 +	subs	x3, x3, #1
 +	b.ne	Lkebab_mark_pixel
-+	add		x0, x0, x4
++	add	x0, x0, x4
 +	subs	x2, x2, #1
 +	b.ne	Lkebab_mark_row
-+	dsb		sy
++	dsb	sy
 +#endif
+ 	mov		x21, #0
  
  	// Set low reset vector before attempting any loads
- 	adrp	x0, EXT(LowExceptionVectorBase)@page
+@@ -618,6 +636,21 @@
+ 	lsr		x5,  x24, #(ARM_TT_L2_SHIFT)
+ 	create_bootstrap_mapping x14, x15, x5, x3, x2, x9, x10, x11, x12, x13
+ 
++#if 1 /* kebab early console */
++	/* Splash framebuffer for kebab_early.c: 4 KiB granule, L1[2]. */
++	MOV64	x10, 0x9c000000
++	ubfx	x11, x10, #30, #9
++	ubfx	x12, x10, #21, #9
++	mov	x13, x2
++	add	x2, x2, PGBYTES
++	mov	x14, #(ARM_TTE_BOOT_TABLE)
++	and	x15, x13, #(ARM_TTE_TABLE_MASK)
++	orr	x14, x14, x15
++	str	x14, [x1, x11, lsl #(TTE_SHIFT)]
++	MOV64	x11, (ARM_TTE_TYPE_BLOCK | ARM_TTE_VALID | ARM_TTE_BLOCK_SH(SH_OUTER_MEMORY) | ARM_TTE_BLOCK_ATTRINDX(CACHE_ATTRINDX_WRITECOMB) | ARM_TTE_BLOCK_AF | ARM_TTE_BLOCK_PNX | ARM_TTE_BLOCK_NX)
++	orr	x11, x11, x10
++	str	x11, [x13, x12, lsl #(TTE_SHIFT)]
++#endif
+ 
+ 	b Lbootstrap_tables_ready
+ Lbootstrap_tables_exhausted:
 diff --git a/osfmk/conf/files.arm64 b/osfmk/conf/files.arm64
 --- a/osfmk/conf/files.arm64
 +++ b/osfmk/conf/files.arm64
