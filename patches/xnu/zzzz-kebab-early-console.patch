@@ -1,157 +1,5 @@
-diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
-index e26a1d7..e3579f1 100644
---- a/osfmk/arm/arm_init.c
-+++ b/osfmk/arm/arm_init.c
-@@ -56,6 +56,7 @@
- #include <pexpert/arm/consistent_debug.h>
- #include <pexpert/device_tree.h>
- #include <arm64/proc_reg.h>
-+#include <arm64/kebab_early.h>
- #include <arm/pmap.h>
- #include <arm/caches_internal.h>
- #include <arm/cpu_internal.h>
-@@ -346,6 +347,8 @@ arm_init(
- 	DTEntry chosen = NULL;
- 	unsigned int dt_entry_size = 0;
- 
-+	kebab_early_mark(1, "arm_init entered (MMU on)");
-+
- 	arm_setup_pre_sign();
- 
- 	arm_slide_rebase_and_sign_image();
-@@ -362,6 +365,7 @@ arm_init(
- #endif /* defined(HAS_APPLE_PAC) */
- 
- 	PE_init_platform(FALSE, args); /* Get platform expert set up */
-+	kebab_early_mark(2, "PE_init_platform done");
- 
- #if __arm64__
- 	configure_timer_apple_regs();
-@@ -423,6 +427,7 @@ arm_init(
- #endif
- 
- 	ml_parse_cpu_topology();
-+	kebab_early_mark(3, "ml_parse_cpu_topology done");
- 
- 
- 	master_cpu = ml_get_boot_cpu_number();
-@@ -453,11 +458,13 @@ arm_init(
- 	 */
- 	thread->machine.preemption_count = 0;
- 	cpu_bootstrap();
-+	kebab_early_mark(4, "cpu_bootstrap done");
- 
- 	rtclock_early_init();
- 
- 	kernel_debug_string_early("kernel_startup_bootstrap");
- 	kernel_startup_bootstrap();
-+	kebab_early_mark(5, "kernel_startup_bootstrap done");
- 
- 	/*
- 	 * Initialize the timer callout world
-@@ -466,6 +473,7 @@ arm_init(
- 
- 	cpu_init();
- 
-+	kebab_early_mark(6, "cpu_init done");
- 	processor_bootstrap();
- 
- 	if (PE_parse_boot_argn("maxmem", &maxmem, sizeof(maxmem))) {
-@@ -513,6 +521,7 @@ arm_init(
- 	__builtin_arm_wsr("pan", 1);
- #endif  /* __ARM_PAN_AVAILABLE__ */
- 
-+	kebab_early_mark(7, "entering arm_vm_init");
- 	arm_vm_init(xmaxmem, args);
- 
- 	if (debug_boot_arg) {
-diff --git a/osfmk/arm64/arm_vm_init.c b/osfmk/arm64/arm_vm_init.c
-index d89b0f1..d0c710d 100644
---- a/osfmk/arm64/arm_vm_init.c
-+++ b/osfmk/arm64/arm_vm_init.c
-@@ -41,6 +41,7 @@
- #include <machine/atomic.h>
- #include <arm64/proc_reg.h>
- #include <arm64/lowglobals.h>
-+#include <arm64/kebab_early.h>
- #include <arm/cpu_data_internal.h>
- #include <arm/misc_protos.h>
- #include <pexpert/arm64/boot.h>
-@@ -2145,6 +2146,8 @@ arm_vm_init(uint64_t memory_size, boot_args * args)
- 
- 	ml_enable_monitor();
- 
-+	/* The framebuffer VA=PA mapping belongs to the outgoing TTBR0. */
-+	kebab_early_disable();
- 	set_mmu_ttb(invalid_ttep & TTBR_BADDR_MASK);
- 
- 	flush_mmu_tlb();
-diff --git a/osfmk/arm64/start.s b/osfmk/arm64/start.s
-index ccbb188..777aca4 100644
---- a/osfmk/arm64/start.s
-+++ b/osfmk/arm64/start.s
-@@ -463,6 +463,25 @@ LEXT(start_first_cpu)
- 	mov		x20, x0
- 	mov		x21, #0
- 
-+#if 1 /* kebab early console */
-+	/* Stage 0: white 64x32 band, no stack or page tables needed. */
-+	MOV64	x0, (0x9c000000 + 2368 * 4320)
-+	mov		w1, #-1
-+	mov		x2, #32
-+	mov		x4, #4320
-+Lkebab_mark_row:
-+	mov		x3, #64
-+	mov		x5, x0
-+Lkebab_mark_pixel:
-+	str		w1, [x5], #4
-+	subs	x3, x3, #1
-+	b.ne	Lkebab_mark_pixel
-+	add		x0, x0, x4
-+	subs	x2, x2, #1
-+	b.ne	Lkebab_mark_row
-+	dsb		sy
-+#endif
-+
- 	// Set low reset vector before attempting any loads
- 	adrp	x0, EXT(LowExceptionVectorBase)@page
- 	add		x0, x0, EXT(LowExceptionVectorBase)@pageoff
-@@ -609,6 +628,32 @@ Lkernelcache_base_found:
- 	lsr		x5,  x24, #(ARM_TT_L2_SHIFT)
- 	create_bootstrap_mapping x14, x15, x5, x3, x2, x9, x10, x11, x12, x13
- 
-+#if 1 /* kebab early console */
-+	/*
-+	 * Splash framebuffer for kebab_early.c.
-+	 *
-+	 * 4 KiB granule: an L1 entry covers 1 GiB, so 0x9C000000 lives in
-+	 * L1[2] while the kernel window sits in L1[3].  The V=P mapping only
-+	 * created L2 tables for the window, so L1[2] is empty and this takes
-+	 * a fresh L2 page from the bump pointer left in x2.
-+	 *
-+	 * The block is mapped Normal Non-Cacheable / write-combining: writes
-+	 * must reach the panel, and the kernel must never execute from here.
-+	 */
-+	MOV64	x10, 0x9c000000
-+	ubfx	x11, x10, #30, #9			// L1 index (1 GiB per entry)
-+	ubfx	x12, x10, #21, #9			// L2 index (2 MiB per entry)
-+	mov		x13, x2					// fresh L2 page
-+	add		x2, x2, PGBYTES
-+	mov		x14, #(ARM_TTE_BOOT_TABLE)
-+	and		x15, x13, #(ARM_TTE_TABLE_MASK)
-+	orr		x14, x14, x15
-+	str		x14, [x1, x11, lsl #(TTE_SHIFT)]
-+	MOV64	x11, (ARM_TTE_TYPE_BLOCK | ARM_TTE_VALID | ARM_TTE_BLOCK_SH(SH_OUTER_MEMORY) | ARM_TTE_BLOCK_ATTRINDX(CACHE_ATTRINDX_WRITECOMB) | ARM_TTE_BLOCK_AF | ARM_TTE_BLOCK_PNX | ARM_TTE_BLOCK_NX)
-+	orr		x11, x11, x10
-+	str		x11, [x13, x12, lsl #(TTE_SHIFT)]
-+#endif
-+
- 	/* Ensure TTEs are visible */
- 	dsb		ish
- 
 diff --git a/osfmk/arm64/kebab_early.c b/osfmk/arm64/kebab_early.c
 new file mode 100644
-index 0000000..8f4c808
 --- /dev/null
 +++ b/osfmk/arm64/kebab_early.c
 @@ -0,0 +1,130 @@
@@ -287,7 +135,6 @@ index 0000000..8f4c808
 +#endif /* KEBAB */
 diff --git a/osfmk/arm64/kebab_early.h b/osfmk/arm64/kebab_early.h
 new file mode 100644
-index 0000000..fbbc827
 --- /dev/null
 +++ b/osfmk/arm64/kebab_early.h
 @@ -0,0 +1,22 @@
@@ -313,11 +160,108 @@ index 0000000..fbbc827
 +#endif
 +
 +#endif
+diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
+--- a/osfmk/arm/arm_init.c
++++ b/osfmk/arm/arm_init.c
+@@ -355,6 +355,8 @@
+ 	DTEntry chosen = NULL;
+ 	unsigned int dt_entry_size = 0;
+ 
++	kebab_early_mark(1, "arm_init entered (MMU on)");
++
+ 	arm_setup_pre_sign();
+ 
+ 	arm_slide_rebase_and_sign_image();
+@@ -371,6 +373,7 @@
+ #endif /* defined(HAS_APPLE_PAC) */
+ 
+ 	PE_init_platform(FALSE, args); /* Get platform expert set up */
++	kebab_early_mark(2, "PE_init_platform done");
+ 	boot_progress_init();
+ 
+ #if __arm64__
+@@ -443,6 +446,7 @@
+ #endif
+ 
+ 	ml_parse_cpu_topology();
++	kebab_early_mark(3, "ml_parse_cpu_topology done");
+ 
+ 
+ 	master_cpu = ml_get_boot_cpu_number();
+@@ -472,11 +476,13 @@
+ 	 */
+ 	thread->machine.preemption_count = 0;
+ 	cpu_bootstrap();
++	kebab_early_mark(4, "cpu_bootstrap done");
+ 
+ 	rtclock_early_init();
+ 
+ 	kernel_debug_string_early("kernel_startup_bootstrap");
+ 	kernel_startup_bootstrap();
++	kebab_early_mark(5, "kernel_startup_bootstrap done");
+ 
+ 	/*
+ 	 * Initialize the timer callout world
+@@ -484,6 +490,8 @@
+ 	timer_call_init();
+ 
+ 	cpu_init();
++
++	kebab_early_mark(6, "cpu_init done");
+ 	processor_bootstrap();
+ 
+ 	if (PE_parse_boot_argn("maxmem", &maxmem, sizeof(maxmem))) {
+@@ -532,6 +540,7 @@
+ #endif  /* __ARM_PAN_AVAILABLE__ */
+ 
+ 	boot_progress_stage("arm_vm_init enter");
++	kebab_early_mark(7, "entering arm_vm_init");
+ 	arm_vm_init(xmaxmem, args);
+ 	boot_progress_stage("arm_vm_init returned");
+ 
+diff --git a/osfmk/arm64/arm_vm_init.c b/osfmk/arm64/arm_vm_init.c
+--- a/osfmk/arm64/arm_vm_init.c
++++ b/osfmk/arm64/arm_vm_init.c
+@@ -2156,6 +2156,7 @@
+ #endif
+ 
+ 	/* The framebuffer VA=PA mapping belongs to the outgoing TTBR0. */
++	kebab_early_disable();
+ 	set_mmu_ttb(invalid_ttep & TTBR_BADDR_MASK);
+ 
+ 	flush_mmu_tlb();
+diff --git a/osfmk/arm64/start.s b/osfmk/arm64/start.s
+--- a/osfmk/arm64/start.s
++++ b/osfmk/arm64/start.s
+@@ -471,6 +471,24 @@
+ 	mov		x20, x0
+ 	mov		x21, #0
+ 
++#if 1 /* kebab early console */
++	/* Stage 0: white 64x32 band, no stack or page tables needed. */
++	MOV64	x0, (0x9c000000 + 2368 * 4320)
++	mov		w1, #-1
++	mov		x2, #32
++	mov		x4, #4320
++Lkebab_mark_row:
++	mov		x3, #64
++	mov		x5, x0
++Lkebab_mark_pixel:
++	str		w1, [x5], #4
++	subs	x3, x3, #1
++	b.ne	Lkebab_mark_pixel
++	add		x0, x0, x4
++	subs	x2, x2, #1
++	b.ne	Lkebab_mark_row
++	dsb		sy
++#endif
+ 
+ 	// Set low reset vector before attempting any loads
+ 	adrp	x0, EXT(LowExceptionVectorBase)@page
 diff --git a/osfmk/conf/files.arm64 b/osfmk/conf/files.arm64
-index c40d57b..b0dad49 100644
 --- a/osfmk/conf/files.arm64
 +++ b/osfmk/conf/files.arm64
-@@ -40,6 +40,7 @@ osfmk/arm64/dbgwrap.c		standard
+@@ -51,6 +51,7 @@
  osfmk/arm/arm_timer.c		standard
  osfmk/arm/arm_init.c	optional config_pmap_ppl
  osfmk/arm64/arm_vm_init.c	optional config_pmap_ppl
@@ -326,7 +270,6 @@ index c40d57b..b0dad49 100644
  osfmk/arm/io_map.c		standard
  osfmk/arm64/loose_ends.c	standard
 diff --git a/osfmk/kern/debug.c b/osfmk/kern/debug.c
-index 0a00656..437adb1 100644
 --- a/osfmk/kern/debug.c
 +++ b/osfmk/kern/debug.c
 @@ -84,6 +84,9 @@
@@ -339,15 +282,3 @@ index 0a00656..437adb1 100644
  #include <IOKit/IOBSD.h>
  
  #if !(MACH_KDP && CONFIG_KDP_INTERACTIVE_DEBUGGING)
-@@ -1069,6 +1072,11 @@ panic_trap_to_debugger(const char *panic_format_str, va_list *panic_args, unsign
- {
- #pragma clang diagnostic pop
- 
-+#if 1 /* kebab early console */
-+	/* No CPU/thread/debugger state is required for this first panic copy. */
-+	kebab_early_panic(panic_format_str, panic_args);
-+#endif
-+
- #if defined(__x86_64__) && (DEVELOPMENT || DEBUG)
- 	read_lbr();
- #endif
