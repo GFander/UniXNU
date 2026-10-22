@@ -127,9 +127,12 @@ def build(ctx, kernel=None):
     payloads.mkdir(parents=True)
     shutil.copyfile(kernel, payloads / 'kernel.macho')
     # The entry probe (stage bars, optional reset) is wanted with either setting; the panic screen is only one part of it.
-    if spec.get('panic_screen') or spec.get('entry_probe_reset_delay'):
+    if spec.get('panic_screen') or spec.get('entry_probe_reset_delay') or spec.get('reset_at'):
         probe = (['--reset-delay', str(int(spec['entry_probe_reset_delay']))]
                  if spec.get('entry_probe_reset_delay') else ['--no-reset'])
+        if spec.get('reset_at'):
+            # Terminal reset at the first instruction of a kernel function.
+            probe = ['--reset-at', str(spec['reset_at'])]
         screen = ['--panic-screen'] if spec.get('panic_screen') else []
         if spec.get('entry_probe_reset_delay') and spec.get('entry_probe_reset_after'):
             # Stage 4 in place of stage 3: reset after the Nth call to SYMBOL in FUNCTION.
