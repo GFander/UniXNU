@@ -1,0 +1,4 @@
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/UefiDebugLibStdErr/DebugLibConstructor.c
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/UefiDebugLibStdErr/DebugLib.c
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr/DEBUG/AutoGen.h

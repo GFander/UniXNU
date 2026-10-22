@@ -1,0 +1,16 @@
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/UniXNUPkg/Test/HelloPayload/HelloPayload/OUTPUT/HelloPayload.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BasePcdLibNull/BasePcdLibNull/OUTPUT/BasePcdLibNull.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseMemoryLib/BaseMemoryLib/OUTPUT/BaseMemoryLib.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseLib/BaseLib/OUTPUT/BaseLib.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib/OUTPUT/BaseDebugPrintErrorLevelLib.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BasePrintLib/BasePrintLib/OUTPUT/BasePrintLib.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr/OUTPUT/UefiDebugLibStdErr.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib/OUTPUT/UefiBootServicesTableLib.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib/OUTPUT/UefiMemoryAllocationLib.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/StackCheckLibNull/StackCheckLibNull/OUTPUT/StackCheckLibNull.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiRuntimeServicesTableLib/UefiRuntimeServicesTableLib/OUTPUT/UefiRuntimeServicesTableLib.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib/OUTPUT/UefiDevicePathLib.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/BaseFdtLib.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint/OUTPUT/UefiApplicationEntryPoint.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiLib/UefiLib/OUTPUT/UefiLib.lib
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib/OUTPUT/CompilerIntrinsicsLib.lib

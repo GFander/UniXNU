@@ -1,0 +1,15 @@
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Main.c
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Menu.c
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Inject.c
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Logo.c
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Kext.c
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Volume.c
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/UniXNULib.inf
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/UniXNUPkg/Library/UniXNULib/UniXNULib/DEBUG/AutoGen.h
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Config.c
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Font.c
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Internal.h
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Slice.c
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Toml.c
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Ui.c
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Library/UniXNULib/Boot.c

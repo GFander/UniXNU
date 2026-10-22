@@ -1,0 +1,10 @@
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/MdeLibs.dsc.inc
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/MdePkg.dec
+/home/albert/Codex/XNU/UniXNU/package/Build/Conf/build_rule.txt
+/home/albert/Codex/XNU/UniXNU/package/Build/Conf/tools_def.txt
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/TOOLS_DEF.AARCH64
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/BuildOptions
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/PcdTokenNumber
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Test/UniXNUTest.dec
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/UniXNUPkg.dec
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/UniXNUPkg.dsc

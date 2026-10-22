@@ -1,0 +1,14 @@
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Test/SampleDriver/SampleDriver.inf
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/BasePrintLib/BasePrintLib.inf
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/BaseLib/BaseLib.inf
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/UefiBootServicesTableLib/UefiBootServicesTableLib.inf
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/UniXNUPkg/Test/SampleDriver/SampleDriver/DEBUG/AutoGen.h
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/UefiDebugLibStdErr/UefiDebugLibStdErr.inf
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+/home/albert/Codex/XNU/UniXNU/package/UniXNUPkg/Test/SampleDriver/SampleDriver.c
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/StackCheckLibNull/StackCheckLibNull.inf

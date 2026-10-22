@@ -90,6 +90,9 @@ RunXnu (
   Request.Kexts          = Kexts;
   Request.KextCount      = KextCount;
   UniXNULog ("xnu: handing off %u staged kext(s) to loader", (UINT32)KextCount);
+  gST->ConOut->Reset (gST->ConOut, FALSE);
+  gST->ConOut->ClearScreen (gST->ConOut);
+  gST->ConOut->SetCursorPosition (gST->ConOut, 0, 0);
   Status = Loader->Boot (Loader, &Request);
   UniXNUFreeKexts (Kexts, KextCount);
   return Status;

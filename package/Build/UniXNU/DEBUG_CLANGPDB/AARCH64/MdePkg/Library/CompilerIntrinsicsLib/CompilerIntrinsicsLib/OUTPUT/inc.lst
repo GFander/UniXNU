@@ -1,0 +1,9 @@
+-I/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/CompilerIntrinsicsLib/AArch64
+-I/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/CompilerIntrinsicsLib
+-I/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib/DEBUG
+-I/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg
+-I/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Include
+-I/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Test/UnitTest/Include
+-I/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Test/Mock/Include
+-I/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/MipiSysTLib/mipisyst/library/include
+-I/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Include/AArch64

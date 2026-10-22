@@ -1,0 +1,10 @@
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/CompilerIntrinsicsLib/memset_ms.c
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/CompilerIntrinsicsLib/AArch64/Atomics.S
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib/DEBUG/AutoGen.h
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/CompilerIntrinsicsLib/memset.c
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/CompilerIntrinsicsLib/memcmp_ms.c
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/CompilerIntrinsicsLib/memcpy.c
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/CompilerIntrinsicsLib/AArch64/ashlti3.S
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/CompilerIntrinsicsLib/memmove_ms.c
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+/home/albert/Codex/UEFI/Mu-Silicium/Mu_Basecore/MdePkg/Library/CompilerIntrinsicsLib/memcpy_ms.c

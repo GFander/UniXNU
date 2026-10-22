@@ -120,8 +120,15 @@ def build(ctx, kernel=None):
     payloads = stage / 'EFI/UniXNU/Payloads'
     payloads.mkdir(parents=True)
     shutil.copyfile(kernel, payloads / 'kernel.macho')
+    patch_args = []
     if spec.get('panic_screen'):
-        run(['python3', ctx.tree / 'scripts/patch-xnu-entry-probe.py', payloads / 'kernel.macho', '--panic-screen', '--no-reset'],
+        patch_args.append('--panic-screen')
+    if spec.get('reset_at'):
+        patch_args += ['--reset-at', str(spec['reset_at'])]
+    elif spec.get('panic_screen'):
+        patch_args.append('--no-reset')
+    if patch_args:
+        run(['python3', ctx.tree / 'scripts/patch-xnu-entry-probe.py', payloads / 'kernel.macho'] + patch_args,
             cwd=ctx.tree, env=dict(os.environ, UNIXNU_UEFI=str(ctx.uefi or '')), log_file=ctx.logs / 'payload-patch.log')
     if trust:
         shutil.copyfile(trust, payloads / 'kernel.macho.trustcache')

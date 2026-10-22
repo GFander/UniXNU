@@ -1,0 +1,7 @@
+
+
+-include /home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BasePrintLib/BasePrintLib/OUTPUT/PrintLib.obj.deps
+
+-include /home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BasePrintLib/BasePrintLib/OUTPUT/PrintLibInternal.obj.deps
+
+               

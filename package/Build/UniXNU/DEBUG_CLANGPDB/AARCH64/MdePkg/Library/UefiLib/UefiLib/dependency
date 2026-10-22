@@ -1,0 +1,15 @@
+
+
+-include /home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiLib/UefiLib/OUTPUT/Acpi.obj.deps
+
+-include /home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiLib/UefiLib/OUTPUT/Console.obj.deps
+
+-include /home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiLib/UefiLib/OUTPUT/UefiDriverModel.obj.deps
+
+-include /home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiLib/UefiLib/OUTPUT/UefiLib.obj.deps
+
+-include /home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiLib/UefiLib/OUTPUT/UefiLibPrint.obj.deps
+
+-include /home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/UefiLib/UefiLib/OUTPUT/UefiNotTiano.obj.deps
+
+               

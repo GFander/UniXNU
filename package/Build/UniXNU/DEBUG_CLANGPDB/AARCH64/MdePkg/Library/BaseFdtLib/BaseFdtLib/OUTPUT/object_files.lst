@@ -1,0 +1,12 @@
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/FdtLib.obj
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/LibFdtWrapper.obj
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/libfdt/libfdt/fdt.obj
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/libfdt/libfdt/fdt_addresses.obj
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/libfdt/libfdt/fdt_check.obj
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/libfdt/libfdt/fdt_empty_tree.obj
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/libfdt/libfdt/fdt_overlay.obj
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/libfdt/libfdt/fdt_ro.obj
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/libfdt/libfdt/fdt_rw.obj
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/libfdt/libfdt/fdt_strerror.obj
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/libfdt/libfdt/fdt_sw.obj
+/home/albert/Codex/XNU/UniXNU/package/Build/UniXNU/DEBUG_CLANGPDB/AARCH64/MdePkg/Library/BaseFdtLib/BaseFdtLib/OUTPUT/libfdt/libfdt/fdt_wip.obj
