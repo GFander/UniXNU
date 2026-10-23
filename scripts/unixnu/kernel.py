@@ -70,7 +70,9 @@ def build(ctx, modules):
     for name in ('git', 'make', 'clang', 'cmake', 'ninja', 'unifdef'):
         tool(name, 'brew install ' + name)
     tool('xcodebuild', 'the kernel step builds with the Xcode iphoneos SDK')
-    script = ctx.tree / 'scripts/build-xnu-4k-baseline.sh'
+    # The board may name its own kernel build script; the 4 KiB baseline is
+    # the default the first bringing-up board used.
+    script = ctx.tree / ctx.board.get('kernel', {}).get('script', 'scripts/build-xnu-4k-baseline.sh')
     if not script.is_file():
         raise Error(f'{script} missing')
     env = dict(os.environ)
