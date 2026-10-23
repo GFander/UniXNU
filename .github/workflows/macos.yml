@@ -143,7 +143,10 @@ jobs:
         run: |
           for f in out/*/logs/*.log; do
             echo "===== $f ====="
-            grep -nE -B3 "error:|\*\*\*" "$f" | tail -45
+            case "$f" in
+              *kernel.log) tail -45 "$f" ;;
+              *) grep -nE -B3 "error:|\*\*\*" "$f" | tail -15 ;;
+            esac
           done
 
       - name: Build userdata
