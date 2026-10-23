@@ -341,46 +341,51 @@ diff --git a/osfmk/arm64/arm_vm_init.c b/osfmk/arm64/arm_vm_init.c
  #include <debug.h>
  
  #include <kern/assert.h>
-@@ -1839,6 +1840,7 @@
+@@ -1835,6 +1836,7 @@
+ 	 */
+ 	gVirtBase = args->virtBase;
+ 	gPhysBase = args->physBase;
++	kebab_early_mark(1, "VM1: boot bases");
+ #if KASAN
  	real_phys_size = args->memSize + (shadow_ptop - shadow_pbase);
  #else
- 	real_phys_size = args->memSize;
-+	kebab_early_mark(11, "memSize read");
- #endif
- 	/*
- 	 * Ensure the physical region we specify for the VM to manage ends on a
 @@ -1978,6 +1980,7 @@
  	 *   the so called physical aperture should be statically mapped
  	 */
  	init_ptpages(cpu_tte, gVirtBase, dynamic_memory_begin, TRUE, ARM_TTE_TABLE_AP(ARM_TTE_TABLE_AP_USER_NA));
-+	kebab_early_mark(12, "kva ptpages done");
++	kebab_early_mark(2, "VM2: initial tables");
  
  #if defined(ARM_LARGE_MEMORY)
  	/*
-@@ -1986,6 +1989,7 @@
- 	 *   the rest of the kernel virtual address space
- 	 */
- 	init_ptpages(cpu_tte, physmap_base, ROUND_L1(physmap_end), TRUE, ARM_DYNAMIC_TABLE_XN | ARM_TTE_TABLE_AP(ARM_TTE_TABLE_AP_USER_NA));
-+	kebab_early_mark(13, "physmap ptpages done");
- #endif
+@@ -2102,6 +2105,7 @@
+ 	vm_prelink_edata = segPRELINKDATAB + segSizePRELINKDATA;
  
+ 	arm_vm_prot_init(args);
++	kebab_early_mark(3, "VM3: kernel protections");
  
-@@ -2148,6 +2152,7 @@
+ 	/*
+ 	 * Initialize the page tables for the low globals:
+@@ -2146,14 +2150,20 @@
+ #endif /* CONFIG_CPU_COUNTERS */
+ 
  	arm_set_user_tbi();
++	kebab_early_mark(4, "VM4: before physmap");
  
  	arm_vm_physmap_init(args);
-+	kebab_early_mark(14, "physmap init done");
++	kebab_early_mark(5, "VM5: physmap built");
  	set_mmu_ttb_alternate(cpu_ttep & TTBR_BADDR_MASK);
  
  #if XNU_MONITOR
-@@ -2253,6 +2258,7 @@
-     }
+ 	ml_enable_monitor();
  #endif
- #endif
-+	kebab_early_mark(15, "entering pmap_bootstrap");
- 	pmap_bootstrap(dynamic_memory_begin);
  
- 	disable_preemption();
++	kebab_early_mark(6, "VM6: dropping TTBR0");
++
++	kebab_early_disable();
++
+ 	set_mmu_ttb(invalid_ttep & TTBR_BADDR_MASK);
+ 
+ 	flush_mmu_tlb();
 diff --git a/osfmk/conf/files.arm64 b/osfmk/conf/files.arm64
 --- a/osfmk/conf/files.arm64
 +++ b/osfmk/conf/files.arm64
