@@ -2,7 +2,7 @@ diff --git a/osfmk/arm64/kebab_early.c b/osfmk/arm64/kebab_early.c
 new file mode 100644
 --- /dev/null
 +++ b/osfmk/arm64/kebab_early.c
-@@ -0,0 +1,229 @@
+@@ -0,0 +1,240 @@
 +/*
 + * OnePlus 10 Pro 5G bootstrap console. No allocation, locks, ADT parsing or
 + * per-CPU state: panic() can reach this before a current thread exists.
@@ -29,6 +29,9 @@ new file mode 100644
 +#define EARLY_COLS (EARLY_WIDTH / EARLY_CELL_W)
 +
 +extern unsigned char iso_font[256 * 16];
++
++_Static_assert(ARM_PGBYTES == 4096, "early framebuffer requires a 4K granule");
++_Static_assert(ARM_TT_L2_SIZE == 0x200000ULL, "early framebuffer uses 2M L2 blocks");
 +
 +/* Initialized data must remain writable until disable, including panics. */
 +static unsigned int early_row, early_col;
@@ -92,8 +95,16 @@ new file mode 100644
 +		return false;   /* not running on the bootstrap root */
 +	}
 +
++	if ((fb & (ARM_TT_L2_SIZE - 1ULL)) != 0) {
++		return false;   /* not 2 MiB aligned */
++	}
++
 +	i1 = (uint32_t)((fb & ARM_TT_L1_INDEX_MASK) >> ARM_TT_L1_SHIFT);
 +	i2 = (uint32_t)((fb & ARM_TT_L2_INDEX_MASK) >> ARM_TT_L2_SHIFT);
++
++	if (i2 + 5u > TTE_PGENTRIES) {
++		return false;   /* five blocks do not fit in one L2 table */
++	}
 +
 +	if (l1[i1] != ARM_TTE_EMPTY) {
 +		return false;   /* never replace a live descriptor */
@@ -109,7 +120,7 @@ new file mode 100644
 +	    ARM_TTE_BLOCK_AF | ARM_TTE_BLOCK_PNX | ARM_TTE_BLOCK_NX;
 +
 +	for (i = 0; i < 5; i++) {
-+		l2[i2 + i] = ((fb + (uint64_t)i * 0x200000ULL) &
++		l2[i2 + i] = ((fb + (uint64_t)i * ARM_TT_L2_SIZE) &
 +		    ARM_TTE_BLOCK_L2_MASK) | flags;
 +	}
 +
@@ -155,7 +166,7 @@ new file mode 100644
 +			return;
 +		}
 +	}
-+	const unsigned char *glyph = iso_font + (unsigned char)c * 16;
++	const unsigned char *glyph = iso_font + (unsigned int)(unsigned char)c * 16u;
 +	for (unsigned int gy = 0; gy < 16; gy++) {
 +		for (unsigned int sy = 0; sy < EARLY_SCALE; sy++) {
 +			volatile uint32_t *line = EARLY_FB +
@@ -272,15 +283,15 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  
  #include <console/serial_protos.h>
  
-@@ -347,6 +348,8 @@
- arm_init(
- 	boot_args       *args)
- {
+@@ -357,6 +358,8 @@
+ 	arm_setup_pre_sign();
+ 
+ 	arm_slide_rebase_and_sign_image();
 +	kebab_early_init(args);
-+	kebab_early_mark(1, "arm_init entered (MMU on)");
- 	unsigned int    maxmem;
- 	uint32_t        memsize;
- 	uint64_t        xmaxmem;
++	kebab_early_mark(1, "arm_init image fixups done");
+ 
+ 	/* If kernel integrity is supported, use a constant copy of the boot args. */
+ 	const_boot_args = *args;
 @@ -442,6 +445,7 @@
  #endif
  
