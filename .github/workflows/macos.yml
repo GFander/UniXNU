@@ -118,6 +118,18 @@ jobs:
             exit 1
           fi
 
+      - name: Probe the SDK private headers
+        run: |
+          for name in macosx iphoneos; do
+            sdk=$(xcrun --sdk "$name" --show-sdk-path 2>/dev/null) || continue
+            h="$sdk/System/Library/Frameworks/Kernel.framework/Versions/A/PrivateHeaders"
+            echo "== $name: $sdk"
+            [ -d "$h" ] && echo "   private headers: $(ls "$h" | wc -l) entries"
+            find "$sdk" -name "firehose_buffer_private.h" 2>/dev/null | head -3
+          done
+          echo "== KDK"
+          ls /Library/Developer/KDKs 2>/dev/null | head -3 || echo "  no KDKs"
+
       - name: Build kernel
         env:
           IPSW_URL: ${{ inputs.ipsw_url }}
