@@ -2,7 +2,7 @@ diff --git a/osfmk/arm64/kebab_early.c b/osfmk/arm64/kebab_early.c
 new file mode 100644
 --- /dev/null
 +++ b/osfmk/arm64/kebab_early.c
-@@ -0,0 +1,240 @@
+@@ -0,0 +1,235 @@
 +/*
 + * OnePlus 10 Pro 5G bootstrap console. No allocation, locks, ADT parsing or
 + * per-CPU state: panic() can reach this before a current thread exists.
@@ -212,11 +212,6 @@ new file mode 100644
 +	kebab_early_string(": ");
 +	kebab_early_string(label);
 +	kebab_early_putc('\n');
-+	/* self-disable: stage 7 is the last mark before arm_vm_init replaces TTBR0,
-+	 * so no separate hook is needed in arm_vm_init.c. */
-+	if (stage >= 7) {
-+		early_disabled = 1;
-+	}
 +}
 +
 +void
