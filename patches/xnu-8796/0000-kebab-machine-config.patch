@@ -124,6 +124,37 @@ index 5bd6f23..0844899 100644
  
  
  #
+diff --git a/makedefs/MakeInc.rule b/makedefs/MakeInc.rule
+index 59e4063..2ed1715 100644
+--- a/makedefs/MakeInc.rule
++++ b/makedefs/MakeInc.rule
+@@ -392,7 +392,7 @@ do_exporthdrs_md: $(EXPORT_MD_GEN_INC_FILES)  $(EXPORT_MD_INC_FILES)
+ #
+ 
+ S_RULE_0=@$(LOG_AS) "$@"
+-S_RULE_1A=$(_v)${S_KCC} -c ${SFLAGS} -MD -MF $(@:o=d) -MP ${$@_SFLAGS_ADD} ${INCFLAGS} ${$@_INCFLAGS}
++S_RULE_1A=$(_v)${S_KCC} -c ${SFLAGS} -MD -MF $(@:o=d) -MJ $(@:o=o.json) -MP ${$@_SFLAGS_ADD} ${INCFLAGS} ${$@_INCFLAGS}
+ S_RULE_1B=$(<F)
+ S_RULE_2=
+ 
+@@ -400,7 +400,7 @@ S_RULE_2=
+ # Compilation rules to generate .o from .c for normal files
+ #
+ C_RULE_0=@$(LOG_CC) "$@"
+-C_RULE_1A=$(_v)${KCC} -c ${filter-out ${$@_CFLAGS_RM}, ${CFLAGS} ${CWARNFLAGS}} -MD -MF $(@:o=d) -MP ${$@_CFLAGS_ADD} ${$@_CWARNFLAGS_ADD} ${INCFLAGS} ${$@_INCFLAGS}
++C_RULE_1A=$(_v)${KCC} -c ${filter-out ${$@_CFLAGS_RM}, ${CFLAGS} ${CWARNFLAGS}} -MD -MF $(@:o=d) -MJ $(@:o=o.json) -MP ${$@_CFLAGS_ADD} ${$@_CWARNFLAGS_ADD} ${INCFLAGS} ${$@_INCFLAGS}
+ C_RULE_1B=$(<F)
+ C_RULE_2=
+ 
+@@ -424,7 +424,7 @@ C_RULE_4B_D=${C_RULE_4B}
+ #   The config tool slickly changes the last source filename char to 'o'
+ #   for the object filename.
+ P_RULE_0=@$(LOG_CXX) "$@"
+-P_RULE_1A=$(_v)${KC++} -o $@ -c ${CXXFLAGS} ${filter-out ${$@_CFLAGS_RM}, ${CFLAGS} ${CXXWARNFLAGS}} -MD -MF $(@:o=d) -MP ${$@_CFLAGS_ADD} ${$@_CXXWARNFLAGS_ADD} ${INCFLAGS} ${$@_INCFLAGS}
++P_RULE_1A=$(_v)${KC++} -o $@ -c ${CXXFLAGS} ${filter-out ${$@_CFLAGS_RM}, ${CFLAGS} ${CXXWARNFLAGS}} -MD -MF $(@:o=d) -MJ $(@:o=o.json) -MP ${$@_CFLAGS_ADD} ${$@_CXXWARNFLAGS_ADD} ${INCFLAGS} ${$@_INCFLAGS}
+ P_RULE_1B=$(<F)
+ P_RULE_2=
+ 
 diff --git a/osfmk/arm64/proc_reg.h b/osfmk/arm64/proc_reg.h
 index 133b07f..d2f9e80 100644
 --- a/osfmk/arm64/proc_reg.h
@@ -145,10 +176,10 @@ index 133b07f..d2f9e80 100644
  /* I-Cache. */
 diff --git a/pexpert/pexpert/arm64/KEBAB.h b/pexpert/pexpert/arm64/KEBAB.h
 new file mode 100644
-index 0000000..d9f0723
+index 0000000..fea4c94
 --- /dev/null
 +++ b/pexpert/pexpert/arm64/KEBAB.h
-@@ -0,0 +1,67 @@
+@@ -0,0 +1,69 @@
 +/*
 + * Copyright (c) 2016 Apple Inc. All rights reserved.
 + */
@@ -159,7 +190,9 @@ index 0000000..d9f0723
 +#define NO_MONITOR 1
 +#define NO_ECORE 1
 +
++#ifndef BCM2837
 +#define BCM2837
++#endif
 +#define BCM2837_BRINGUP
 +#define ARM_ARCH_TIMER
 +
