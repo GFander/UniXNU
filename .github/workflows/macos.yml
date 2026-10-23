@@ -143,7 +143,7 @@ jobs:
         run: |
           for f in out/*/logs/*.log; do
             echo "===== $f ====="
-            grep -nE -B2 -A4 "error:" "$f" | head -40
+            grep -nE -B3 "error:|\*\*\*" "$f" | tail -45
           done
 
       - name: Build userdata
