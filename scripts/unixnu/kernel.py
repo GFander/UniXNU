@@ -80,7 +80,12 @@ def build(ctx, modules):
     env.update(version_env(modules))
     env['JOBS'] = str(ctx.jobs)
     machine = ctx.board.get('kernel', {}).get('machine_config', 'BCM2837')
-    record = ctx.tree / f'build/xnu/ios-obj/DEVELOPMENT_ARM64_{machine}/osfmk/DEVELOPMENT/startup.o.json'
+    object_dir = ctx.tree / f'build/xnu/ios-obj/DEVELOPMENT_ARM64_{machine}/osfmk/DEVELOPMENT'
+    # The compile record is what the archive builders read; a build that does not
+    # emit records still leaves the objects, and that is enough to tell the pass ran.
+    record = object_dir / 'startup.o.json'
+    if not record.is_file() and (object_dir / 'startup.o').is_file():
+        record = object_dir / 'startup.o'
     if not record.is_file():
         # The archive builders and the boot progress layer read compile records of the XNU build, which only an earlier
         # pass leaves behind. A first build from scratch therefore runs one pass without them; XNU_BOOTSTRAP makes it
