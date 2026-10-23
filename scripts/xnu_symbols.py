@@ -36,7 +36,9 @@ def kernel_names(root, global_only=True):
     if not filelist.is_file():
         # link.filelist is only written by the xnu_libraries pass; the kernel
         # objects of a normal pass carry the same names.
-        objects = sorted((root / OBJ).rglob('*.o'))
+        # genassym.o is a generated header container, not a Mach-O object.
+        objects = sorted(o for o in (root / OBJ).rglob('*.o')
+                         if o.name != 'genassym.o')
         if not objects:
             raise SystemExit('No XNU symbol names: run a kernel pass first')
         return defined_names(objects, global_only)
