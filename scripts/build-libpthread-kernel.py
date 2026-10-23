@@ -42,12 +42,14 @@ SOURCE = WORK
 OUT = ROOT / 'build/libpthread-kernel'
 OUT.mkdir(parents=True, exist_ok=True)
 recipe = _xnu_obj_dir() / 'osfmk/DEVELOPMENT/prng_random.o.json'
-record = json.loads(recipe.read_text().strip().rstrip(','))
+# The compile record is optional: without it the bootstrap source is built with
+# the same generic flags as the rest of the archive.
+record = json.loads(recipe.read_text().strip().rstrip(',')) if recipe.is_file() else None
 sdk = subprocess.check_output(['xcrun', '--sdk', 'iphoneos', '--show-sdk-path'], text=True).strip()
 
 
 def compile_one(source, destination, namespace=None):
-    if source.name == 'source_pthread_bootstrap.c':
+    if source.name == 'source_pthread_bootstrap.c' and record is not None:
         command = []
         arguments = record['arguments']
         index = 0
