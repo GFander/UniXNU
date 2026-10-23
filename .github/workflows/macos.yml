@@ -131,7 +131,7 @@ jobs:
         run: |
           for f in out/*/logs/*.log; do
             echo "===== $f ====="
-            grep -nE "error|Error|KEBAB|MASTER|No such|cannot|undefined" "$f" | tail -60
+            grep -nE -A6 "error:|Error [0-9]|Unsupported|No such|Unable to locate|symbol_aliasing" "$f" | grep -vE "urllib|HTTPError" | tail -60
           done
 
       - name: Build userdata
