@@ -145,7 +145,7 @@ jobs:
             echo "===== $f ====="
             case "$f" in
               *kernel.log) sed -n "/Undefined symbols/,/symbol(s) not found/p" "$f" | head -40 ;;
-              *) grep -nE -B6 -m3 "error:|fatal error" "$f" | head -50 ;;
+              *) tail -40 "$f" ;;
             esac
           done
 
