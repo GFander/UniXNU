@@ -2,7 +2,16 @@
 import subprocess
 from pathlib import Path
 
-OBJ = 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837'
+_OBJ_ROOT = Path('build/xnu/ios-obj')
+
+
+def _obj_dir(root=Path('.')):
+    """The object directory of this tree's kernel pass, whatever machine config it used."""
+    candidates = sorted((Path(root) / _OBJ_ROOT).glob('DEVELOPMENT_ARM64_*'))
+    return candidates[0].relative_to(Path(root)) if candidates else _OBJ_ROOT / 'DEVELOPMENT_ARM64_BCM2837'
+
+
+OBJ = _obj_dir()
 
 
 def defined_names(paths, global_only):
