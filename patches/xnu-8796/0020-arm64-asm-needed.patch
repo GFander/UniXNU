@@ -1,0 +1,39 @@
+diff --git a/osfmk/conf/files.arm64 b/osfmk/conf/files.arm64
+index c40d57b..0bd5a25 100644
+--- a/osfmk/conf/files.arm64
++++ b/osfmk/conf/files.arm64
+@@ -30,7 +30,7 @@ osfmk/arm64/amcc_rorgn_common.c optional nos_arm_asm
+ osfmk/arm64/bcopy.s standard
+ osfmk/arm64/bzero.s standard
+ osfmk/arm/caches.c		standard
+-osfmk/arm64/caches_asm.s		optional nos_arm_asm
++osfmk/arm64/caches_asm.s		standard
+ osfmk/arm64/copyio.c	standard
+ osfmk/arm64/cpu.c		standard
+ osfmk/arm/cpu_common.c		standard
+@@ -44,20 +44,20 @@ osfmk/arm64/arm64_hypercall.c	standard
+ osfmk/arm/io_map.c		standard
+ osfmk/arm64/loose_ends.c	standard
+ osfmk/arm/locks_arm.c	standard
+-osfmk/arm64/locore.s	optional nos_arm_asm
++osfmk/arm64/locore.s	standard
+ osfmk/arm64/iofilter_asm.s	optional nos_arm_asm
+ osfmk/arm64/iofilter.c	optional nos_arm_asm
+ osfmk/arm64/gxf_exceptions.s	optional nos_arm_asm
+ osfmk/arm64/lowmem_vectors.c	standard
+ osfmk/arm64/sleh.c			standard
+-osfmk/arm64/start.s	optional nos_arm_asm config_pmap_ppl
+-osfmk/arm64/pinst.s	optional nos_arm_asm
+-osfmk/arm64/cswitch.s	optional nos_arm_asm
++osfmk/arm64/start.s	optional config_pmap_ppl
++osfmk/arm64/pinst.s	standard
++osfmk/arm64/cswitch.s	standard
+ osfmk/arm/machine_cpuid.c	standard
+ osfmk/arm/machine_routines_common.c		standard
+ osfmk/arm64/lock_ticket_pv.c		optional config_pv_ticket
+ osfmk/arm64/machine_routines.c		standard
+-osfmk/arm64/machine_routines_asm.s	optional nos_arm_asm
++osfmk/arm64/machine_routines_asm.s	standard
+ osfmk/arm64/machine_task.c		standard
+ osfmk/arm/machine_routines_apple.c	optional nos_arm_asm
+ osfmk/arm/pal_routines.c		standard
