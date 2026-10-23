@@ -80,7 +80,7 @@ def compile_one(source, destination, namespace=None):
                    '-Wno-deprecated-declarations', '-c', str(source), '-o', str(destination)]
     if namespace:
         command += ['-include', str(namespace)]
-    result = subprocess.run(command, cwd=record['directory'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    result = subprocess.run(command, cwd=record['directory'] if record else str(ROOT), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     destination.with_suffix('.log').write_text(result.stdout)
     if result.returncode:
         raise SystemExit(result.stdout[-4500:])
