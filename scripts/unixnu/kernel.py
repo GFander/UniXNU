@@ -97,7 +97,8 @@ def build(ctx, modules):
             run(['bash', script], cwd=ctx.tree, env=subprocess_env, log_file=ctx.logs / 'kernel-bootstrap.log')
         except Error:
             if not record.is_file():
-                objects = list(object_dir.glob('*.o'))
+                machine_dir = object_dir.parents[1]
+                objects = list(machine_dir.rglob('*.o'))
                 if not objects:
                     raise
                 log(f'kernel: bootstrap pass stopped at the link, {len(objects)} objects present')
