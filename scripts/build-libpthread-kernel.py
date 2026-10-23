@@ -2,6 +2,14 @@
 """Build the matching Darwin 23 pthread kernel component and its real registration."""
 import json
 
+def _xnu_obj_dir(root=None):
+    """Object directory of this tree's kernel pass, whatever machine config it used."""
+    base = Path(root or ROOT) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0] if found else base / 'DEVELOPMENT_ARM64_BCM2837'
+
+
+
 def _xnu_obj_dir_name(root='.'):
     """Name of this tree's kernel object directory, whatever machine config it used."""
     base = Path(root) / 'build/xnu/ios-obj'
@@ -33,7 +41,7 @@ for patch in sorted((ROOT / 'patches/libpthread').glob('*.patch')):
 SOURCE = WORK
 OUT = ROOT / 'build/libpthread-kernel'
 OUT.mkdir(parents=True, exist_ok=True)
-recipe = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/osfmk/DEVELOPMENT/prng_random.o.json'
+recipe = _xnu_obj_dir() / 'osfmk/DEVELOPMENT/prng_random.o.json'
 record = json.loads(recipe.read_text().strip().rstrip(','))
 sdk = subprocess.check_output(['xcrun', '--sdk', 'iphoneos', '--show-sdk-path'], text=True).strip()
 

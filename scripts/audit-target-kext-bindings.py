@@ -7,6 +7,14 @@ remain separate requirements. No target bytes or signatures are changed.
 """
 import argparse
 
+def _xnu_obj_dir(root=None):
+    """Object directory of this tree's kernel pass, whatever machine config it used."""
+    base = Path(root or ROOT) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0] if found else base / 'DEVELOPMENT_ARM64_BCM2837'
+
+
+
 def _xnu_obj_dir_name(root='.'):
     """Name of this tree's kernel object directory, whatever machine config it used."""
     base = Path(root) / 'build/xnu/ios-obj'
@@ -28,7 +36,7 @@ args = parser.parse_args()
 folder = ROOT / 'build/target-kexts' / args.bundle
 metadata = json.loads((folder / 'segments.json').read_text())
 stock = ROOT / '.cache/firmware/kernelcache.macho/kernelcache.release.ipad7.decompressed'
-baseline = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/mach.development.bcm2837.unstripped.noctf'
+baseline = _xnu_obj_dir() / 'mach.development.bcm2837.unstripped.noctf'
 data = stock.read_bytes()
 if hashlib.sha256(data).hexdigest() != 'f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7':
     raise SystemExit('Wrong target kernelcache')

@@ -5,6 +5,14 @@ probe runs it after the original IOGPUFamily kext has loaded. Same binding recip
 original constructor, destructor and metaclass addresses from build/gpu-analysis/ioaccelerator-base-abi.json)."""
 import hashlib
 
+def _xnu_obj_dir(root=None):
+    """Object directory of this tree's kernel pass, whatever machine config it used."""
+    base = Path(root or ROOT) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0] if found else base / 'DEVELOPMENT_ARM64_BCM2837'
+
+
+
 def _xnu_obj_dir_name(root='.'):
     """Name of this tree's kernel object directory, whatever machine config it used."""
     base = Path(root) / 'build/xnu/ios-obj'
@@ -46,7 +54,7 @@ plan = json.loads(plan_path.read_text())
 if plan['operational_overrides'] or plan['instance_bytes'] != 136 or plan['virtual_entries'] != 168:
     sys.exit('The audited original base is not the expected 136-byte, 168-entry class without operational overrides')
 
-record = json.loads((ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/iokit/DEVELOPMENT/IOPlatformExpert.cpo.json').read_text().strip().rstrip(','))
+record = json.loads((_xnu_obj_dir() / 'iokit/DEVELOPMENT/IOPlatformExpert.cpo.json').read_text().strip().rstrip(','))
 source = ROOT / 'drivers/NativeAdreno/NativeAdrenoAccelerator.cpp'
 obj = OUT / 'NativeAdrenoAccelerator.o'
 cmd, i, args = [], 0, record['arguments']

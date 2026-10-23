@@ -2,6 +2,14 @@
 """Compile XNU's minimal executable-root filesystem for offline tests."""
 import json
 
+def _xnu_obj_dir(root=None):
+    """Object directory of this tree's kernel pass, whatever machine config it used."""
+    base = Path(root or ROOT) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0] if found else base / 'DEVELOPMENT_ARM64_BCM2837'
+
+
+
 def _xnu_obj_dir_name(root='.'):
     """Name of this tree's kernel object directory, whatever machine config it used."""
     base = Path(root) / 'build/xnu/ios-obj'
@@ -14,7 +22,7 @@ import struct
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
-recipe = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/bsd/DEVELOPMENT/vfs_conf.o.json'
+recipe = _xnu_obj_dir() / 'bsd/DEVELOPMENT/vfs_conf.o.json'
 record = json.loads(recipe.read_text().strip().rstrip(','))
 out = ROOT / 'build/mockfs-fixture'
 out.mkdir(parents=True, exist_ok=True)

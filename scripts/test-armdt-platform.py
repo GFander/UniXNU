@@ -8,6 +8,14 @@ source crypto provider before platform matching.
 """
 import argparse
 
+def _xnu_obj_dir(root=None):
+    """Object directory of this tree's kernel pass, whatever machine config it used."""
+    base = Path(root or ROOT) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0] if found else base / 'DEVELOPMENT_ARM64_BCM2837'
+
+
+
 def _xnu_obj_dir_name(root='.'):
     """Name of this tree's kernel object directory, whatever machine config it used."""
     base = Path(root) / 'build/xnu/ios-obj'
@@ -30,7 +38,7 @@ args = parser.parse_args()
 
 configure = ROOT / 'build/darwinboot-armdt-platform'
 bsd = ROOT / 'build/darwinboot-armdt-bsd'
-kernel = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/mach.development.bcm2837.unstripped.noctf'
+kernel = _xnu_obj_dir() / 'mach.development.bcm2837.unstripped.noctf'
 
 if not args.check_existing:
     subprocess.run(['python3', ROOT / 'scripts/probe-darwinboot-xnu.py',

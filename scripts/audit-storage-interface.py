@@ -2,6 +2,14 @@
 """Qualify original ordinary-ARM64 block-storage ABI using public Darwin 23 source."""
 import hashlib
 
+def _xnu_obj_dir(root=None):
+    """Object directory of this tree's kernel pass, whatever machine config it used."""
+    base = Path(root or ROOT) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0] if found else base / 'DEVELOPMENT_ARM64_BCM2837'
+
+
+
 def _xnu_obj_dir_name(root='.'):
     """Name of this tree's kernel object directory, whatever machine config it used."""
     base = Path(root) / 'build/xnu/ios-obj'
@@ -34,7 +42,7 @@ for path in source.glob('*.h'):
 sdk = Path(subprocess.check_output(['xcrun', '--sdk', 'macosx', '--show-sdk-path'], text=True).strip())
 conditions = sdk / 'usr/include/TargetConditionals.h'
 shutil.copyfile(conditions, out / 'include/TargetConditionals.h')
-record = json.loads((ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/iokit/DEVELOPMENT/IOPlatformExpert.cpo.json').read_text().strip().rstrip(','))
+record = json.loads((_xnu_obj_dir() / 'iokit/DEVELOPMENT/IOPlatformExpert.cpo.json').read_text().strip().rstrip(','))
 obj_path = out / 'IOBlockStorageDevice-reference.o'
 arguments = record['arguments']
 command, index = [], 0

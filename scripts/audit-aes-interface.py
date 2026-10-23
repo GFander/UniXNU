@@ -6,6 +6,14 @@ linked, executed, or used as a substitute target component.
 """
 import argparse
 
+def _xnu_obj_dir(root=None):
+    """Object directory of this tree's kernel pass, whatever machine config it used."""
+    base = Path(root or ROOT) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0] if found else base / 'DEVELOPMENT_ARM64_BCM2837'
+
+
+
 def _xnu_obj_dir_name(root='.'):
     """Name of this tree's kernel object directory, whatever machine config it used."""
     base = Path(root) / 'build/xnu/ios-obj'
@@ -152,7 +160,7 @@ require(inherited == 162, 'Unexpected inherited method count')
 meta = returned_address(int(rows[7]['candidate_target'], 16))
 require(meta is not None, 'Unqualified original metaclass getter')
 service_meta = next(va for va, names in exports.items() if '__ZN9IOService10gMetaClassE' in names)
-obj = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/libkern/DEVELOPMENT/OSMetaClass.cpo'
+obj = _xnu_obj_dir() / 'libkern/DEVELOPMENT/OSMetaClass.cpo'
 dwarf = subprocess.check_output(['xcrun', 'dwarfdump', '--name=OSMetaClass', '--show-children', obj], text=True)
 layout = {}
 for member in dwarf.split('DW_TAG_member')[1:]:

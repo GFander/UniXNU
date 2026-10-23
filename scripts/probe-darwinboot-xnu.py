@@ -2,6 +2,14 @@
 """Verify native 4K XNU translation after the real UEFI/UniXNU handoff."""
 import argparse
 
+def _xnu_obj_dir(root=None):
+    """Object directory of this tree's kernel pass, whatever machine config it used."""
+    base = Path(root or ROOT) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0] if found else base / 'DEVELOPMENT_ARM64_BCM2837'
+
+
+
 def _xnu_obj_dir_name(root='.'):
     """Name of this tree's kernel object directory, whatever machine config it used."""
     base = Path(root) / 'build/xnu/ios-obj'
@@ -21,7 +29,7 @@ import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--kernel', type=Path, default=ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/mach.development.bcm2837.unstripped.noctf')
+parser.add_argument('--kernel', type=Path, default=_xnu_obj_dir() / 'mach.development.bcm2837.unstripped.noctf')
 parser.add_argument('--output', type=Path, default=ROOT / 'build/darwinboot-xnu')
 parser.add_argument('--timeout', type=int, choices=range(1, 1801), default=25, help='Bounded guest deadline: up to 300 seconds, or 1800 for explicit live HID control')
 parser.add_argument('--mutate-target-main-page', action='store_true', help='Negative input control: corrupt only the actual launchd LC_MAIN vnode page before genuine validation, preserving original files/signatures')
@@ -1026,7 +1034,7 @@ if args.mutate_own_vnode_page is not None or cache_fault or main_fault:
         f'{address:x}:{page:x}:{offset & 4095:x}:{hashlib.sha256(image_bytes[page:page + 4096]).hexdigest()}'])
     if cache_fault or main_fault:
         dwarf = subprocess.check_output(['xcrun', 'dwarfdump', '--name=cs_blob', '--show-children',
-            ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/bsd/DEVELOPMENT/ubc_subr.o'], text=True)
+            _xnu_obj_dir() / 'bsd/DEVELOPMENT/ubc_subr.o'], text=True)
         field = re.search(r'DW_AT_name\s+\("csb_cdhash"\)[\s\S]*?DW_AT_data_member_location\s+\((0x[0-9a-f]+)\)', dwarf)
         if main_fault:
             original_record = json.loads((ROOT / 'build/target-dyld-fixture/inputs.json').read_text())
@@ -1082,7 +1090,7 @@ if pgz_fix_counter:
     inspections += [('_native_zone_pgz_alignment_decodes', 8)]
 video_layout = None
 if args.inspect_boot_video:
-    obj = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/pexpert/DEVELOPMENT/pe_init.o'
+    obj = _xnu_obj_dir() / 'pexpert/DEVELOPMENT/pe_init.o'
     state_dwarf = subprocess.check_output(['xcrun', 'dwarfdump', '--name=PE_state', '--show-children', obj], text=True)
     video_dwarf = subprocess.check_output(['xcrun', 'dwarfdump', '--name=PE_Video', '--show-children', obj], text=True)
     def member_offset(text, name):

@@ -2,6 +2,14 @@
 """Qualify original Legacy lifecycle and preserve its real backend refusal."""
 import hashlib
 
+def _xnu_obj_dir(root=None):
+    """Object directory of this tree's kernel pass, whatever machine config it used."""
+    base = Path(root or ROOT) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0] if found else base / 'DEVELOPMENT_ARM64_BCM2837'
+
+
+
 def _xnu_obj_dir_name(root='.'):
     """Name of this tree's kernel object directory, whatever machine config it used."""
     base = Path(root) / 'build/xnu/ios-obj'
@@ -45,7 +53,7 @@ plan = json.loads(candidate.with_suffix('.json').read_text())
 raw = candidate.read_bytes()
 image = macho(raw)
 require(sha(candidate) == plan['candidate_sha256'], 'Exact observed candidate')
-native = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/mach.development.bcm2837.unstripped.noctf'
+native = _xnu_obj_dir() / 'mach.development.bcm2837.unstripped.noctf'
 require(sha(native) == plan['native_sha256'], 'Current native source kernel')
 for family, digest in plan['original_executable_sha256'].items():
     extents = [e for e in plan['extents'] if e['module'] == family and e['segment'] == '__TEXT_EXEC']
