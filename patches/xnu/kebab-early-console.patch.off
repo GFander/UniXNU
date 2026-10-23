@@ -272,15 +272,15 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  
  #include <console/serial_protos.h>
  
-@@ -220,6 +221,8 @@
- static void
- arm_slide_rebase_and_sign_image(void)
+@@ -347,6 +348,8 @@
+ arm_init(
+ 	boot_args       *args)
  {
 +	kebab_early_init(args);
 +	kebab_early_mark(1, "arm_init entered (MMU on)");
- 	kernel_mach_header_t *k_mh, *kc_mh = NULL;
- 	kernel_segment_command_t *seg;
- 	uintptr_t slide;
+ 	unsigned int    maxmem;
+ 	uint32_t        memsize;
+ 	uint64_t        xmaxmem;
 @@ -442,6 +445,7 @@
  #endif
  
