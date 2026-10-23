@@ -330,6 +330,57 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  	arm_vm_init(xmaxmem, args);
  	boot_progress_stage("arm_vm_init returned");
  
+diff --git a/osfmk/arm64/arm_vm_init.c b/osfmk/arm64/arm_vm_init.c
+--- a/osfmk/arm64/arm_vm_init.c
++++ b/osfmk/arm64/arm_vm_init.c
+@@ -27,6 +27,7 @@
+  */
+ 
+ #include <mach_kdp.h>
++#include <arm64/kebab_early.h>
+ #include <debug.h>
+ 
+ #include <kern/assert.h>
+@@ -1839,6 +1840,7 @@
+ 	real_phys_size = args->memSize + (shadow_ptop - shadow_pbase);
+ #else
+ 	real_phys_size = args->memSize;
++	kebab_early_mark(11, "memSize read");
+ #endif
+ 	/*
+ 	 * Ensure the physical region we specify for the VM to manage ends on a
+@@ -1978,6 +1980,7 @@
+ 	 *   the so called physical aperture should be statically mapped
+ 	 */
+ 	init_ptpages(cpu_tte, gVirtBase, dynamic_memory_begin, TRUE, ARM_TTE_TABLE_AP(ARM_TTE_TABLE_AP_USER_NA));
++	kebab_early_mark(12, "kva ptpages done");
+ 
+ #if defined(ARM_LARGE_MEMORY)
+ 	/*
+@@ -1986,6 +1989,7 @@
+ 	 *   the rest of the kernel virtual address space
+ 	 */
+ 	init_ptpages(cpu_tte, physmap_base, ROUND_L1(physmap_end), TRUE, ARM_DYNAMIC_TABLE_XN | ARM_TTE_TABLE_AP(ARM_TTE_TABLE_AP_USER_NA));
++	kebab_early_mark(13, "physmap ptpages done");
+ #endif
+ 
+ 
+@@ -2148,6 +2152,7 @@
+ 	arm_set_user_tbi();
+ 
+ 	arm_vm_physmap_init(args);
++	kebab_early_mark(14, "physmap init done");
+ 	set_mmu_ttb_alternate(cpu_ttep & TTBR_BADDR_MASK);
+ 
+ #if XNU_MONITOR
+@@ -2253,6 +2258,7 @@
+     }
+ #endif
+ #endif
++	kebab_early_mark(15, "entering pmap_bootstrap");
+ 	pmap_bootstrap(dynamic_memory_begin);
+ 
+ 	disable_preemption();
 diff --git a/osfmk/conf/files.arm64 b/osfmk/conf/files.arm64
 --- a/osfmk/conf/files.arm64
 +++ b/osfmk/conf/files.arm64
