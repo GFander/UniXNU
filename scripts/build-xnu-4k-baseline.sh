@@ -43,14 +43,8 @@ for LATE_PATCH in "$ROOT/patches/xnu/zzz-boot-progress.patch" "$ROOT/patches/xnu
 done
 for PATCH in "$ROOT"/patches/xnu/*.patch "$ROOT"/kits/NativePrelink/patches/*.patch; do
   if ! git -C .cache/xnu-work apply --reverse --check "$PATCH" >/dev/null 2>&1; then
-    if git -C .cache/xnu-work apply --check "$PATCH" >/dev/null 2>&1; then
-      git -C .cache/xnu-work apply "$PATCH"
-    else
-      # git apply refuses line offsets; patch(1) searches for the context.
-      # Later patches in the series legitimately shift the lines an earlier
-      # one targeted, so fall back instead of failing the build.
-      ( cd .cache/xnu-work && patch -p1 --forward --batch --fuzz=2 --no-backup-if-mismatch < "$PATCH" )
-    fi
+    git -C .cache/xnu-work apply --check "$PATCH"
+    git -C .cache/xnu-work apply "$PATCH"
   fi
 done
 export XNU_AVAILABILITY_PL=$ROOT/.cache/fakeroot/usr/local/libexec/availability.pl
