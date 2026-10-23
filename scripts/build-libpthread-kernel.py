@@ -67,6 +67,10 @@ def compile_one(source, destination, namespace=None):
                    '-isysroot', sdk, '-mkernel', '-ffreestanding', '-fno-builtin', '-fno-stack-check',
                    '-std=gnu11', '-fblocks', '-O2', '-mno-implicit-float',
                    '-DKERNEL=1', '-DKERNEL_PRIVATE=1', '-DXNU_KERNEL_PRIVATE=1',
+                   # The pinned libpthread is newer than xnu-8796: its JIT
+                   # entitlement callbacks do not exist in this kernel's
+                   # pthread_callbacks_s, so build without them.
+                   '-D_PTHREAD_CONFIG_JIT_WRITE_PROTECT=0',
                    '-DMACH_KERNEL_PRIVATE=1', '-DMACH_ASSERT=1', '-DDEBUG=1',
                    '-D__PTHREAD_EXPOSE_INTERNALS__=1', '-DABSOLUTETIME_SCALAR_TYPE=1', '-DNEEDS_SCHED_CALL_T=1',
                    '-I', str(SOURCE / 'private'), '-I', str(SOURCE / 'include'), '-I', str(SOURCE),
