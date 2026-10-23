@@ -60,6 +60,10 @@ jobs:
     # xnu-8796 needs Xcode 15.x: Xcode 16 iig emits IORPC.kernelContent,
     # which the iOS 16 kernel does not have.
     runs-on: macos-14
+    env:
+      # Unauthenticated api.github.com allows 60 requests per hour and the
+      # shared runner addresses exhaust that; 1000 with the workflow token.
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
@@ -91,7 +95,6 @@ jobs:
 
       - name: Prepare inputs
         env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TRUST_CACHE_URL: ${{ inputs.trust_cache_url }}
           DATA_SEED_URL: ${{ inputs.data_seed_url }}
           GROW_GIB: ${{ inputs.grow_gib }}
