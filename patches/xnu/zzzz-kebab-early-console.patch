@@ -65,8 +65,8 @@ new file mode 100644
 +	uint64_t     va = (uint64_t)EARLY_FB;
 +	uint64_t     l1_index = (va >> ARM_TT_L1_SHIFT) & (ARM_TTE_MAX - 1);
 +	uint64_t     l2_index = (va >> ARM_TT_L2_SHIFT) & (ARM_TTE_MAX - 1);
-+	tt_entry_t  *l1 = (tt_entry_t *)(void *)bootstrap_pagetables;
-+	tt_entry_t  *l2 = (tt_entry_t *)(void *)kebab_fb_l2;
++	uint64_t  *l1 = (uint64_t *)(void *)bootstrap_pagetables;
++	uint64_t  *l2 = (uint64_t *)(void *)kebab_fb_l2;
 +
 +	l1[l1_index] = ((uint64_t)(uintptr_t)l2) | ARM_TTE_BOOT_TABLE;
 +	l2[l2_index] = (va & ARM_TTE_BLOCK_L2_MASK) |
