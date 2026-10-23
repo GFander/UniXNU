@@ -259,6 +259,8 @@ EXTRA_MAKE_ARGS+=("ubc_subr.o_CFLAGS_ADD=-DXNU_NATIVE_CS_HASH_CACHE=$CS_HASH_CAC
 EXTRA_CFLAGS=${XNU_EXTRA_CFLAGS:--Wno-reserved-identifier -Wno-pre-c11-compat -Wno-missing-designated-field-initializers -Wno-suggest-override -Wno-unnecessary-virtual-specifier -Wno-suggest-destructor-override -Wno-ms-bitfield-padding}
 # 16 KiB granule: matches the iOS userland page size (ARM_PGSHIFT 14).
 EXTRA_CFLAGS="$EXTRA_CFLAGS -D__ARM_16K_PG__"
+# Warnings drown the errors in the CI log; keep the build readable.
+EXTRA_CFLAGS="$EXTRA_CFLAGS -w"
 
 # Drop warning flags this clang does not know: the default list predates the
 # toolchain xnu-8796 was built with.
