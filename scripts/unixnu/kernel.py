@@ -79,7 +79,8 @@ def build(ctx, modules):
     env.update(xnu_env(ctx))
     env.update(version_env(modules))
     env['JOBS'] = str(ctx.jobs)
-    record = ctx.tree / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/osfmk/DEVELOPMENT/startup.o.json'
+    machine = ctx.board.get('kernel', {}).get('machine_config', 'BCM2837')
+    record = ctx.tree / f'build/xnu/ios-obj/DEVELOPMENT_ARM64_{machine}/osfmk/DEVELOPMENT/startup.o.json'
     if not record.is_file():
         # The archive builders and the boot progress layer read compile records of the XNU build, which only an earlier
         # pass leaves behind. A first build from scratch therefore runs one pass without them; XNU_BOOTSTRAP makes it
