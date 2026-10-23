@@ -34,7 +34,12 @@ def kernel_names(root, global_only=True):
         return defined_names([checkpoint], global_only)
     filelist = root / OBJ / 'link.filelist'
     if not filelist.is_file():
-        raise SystemExit('No XNU symbol names: run a kernel pass first (it writes link.filelist)')
+        # link.filelist is only written by the xnu_libraries pass; the kernel
+        # objects of a normal pass carry the same names.
+        objects = sorted((root / OBJ).rglob('*.o'))
+        if not objects:
+            raise SystemExit('No XNU symbol names: run a kernel pass first')
+        return defined_names(objects, global_only)
     names = defined_names([line.strip() for line in filelist.read_text().splitlines() if line.strip()], global_only)
     # The link also exports aliases (all-alias.exp: "_real _alias") that no object defines under that name.
     aliases = root / OBJ / 'all-alias.exp'
