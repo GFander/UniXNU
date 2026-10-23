@@ -57,7 +57,9 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-15
+    # xnu-8796 needs Xcode 15.x: Xcode 16 iig emits IORPC.kernelContent,
+    # which the iOS 16 kernel does not have.
+    runs-on: macos-14
     timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
