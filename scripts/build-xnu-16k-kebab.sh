@@ -42,7 +42,8 @@ for LATE_PATCH in "$ROOT/patches/xnu/zzz-boot-progress.patch" "$ROOT/patches/xnu
     git -C .cache/xnu-work apply --reverse "$LATE_PATCH"
   fi
 done
-for PATCH in "$ROOT"/patches/xnu/*.patch "$ROOT"/kits/NativePrelink/patches/*.patch; do
+# 8796 has its own patch set: the 17.x patches under patches/xnu do not apply.
+for PATCH in "$ROOT"/patches/xnu-8796/*.patch; do
   if ! git -C .cache/xnu-work apply --reverse --check "$PATCH" >/dev/null 2>&1; then
     git -C .cache/xnu-work apply --check "$PATCH"
     git -C .cache/xnu-work apply "$PATCH"
