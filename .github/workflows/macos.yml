@@ -91,6 +91,7 @@ jobs:
 
       - name: Prepare inputs
         env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TRUST_CACHE_URL: ${{ inputs.trust_cache_url }}
           DATA_SEED_URL: ${{ inputs.data_seed_url }}
           GROW_GIB: ${{ inputs.grow_gib }}

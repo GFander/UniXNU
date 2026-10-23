@@ -2,6 +2,7 @@
 """Fetch only SHA-pinned Adreno source and firmware; never execute firmware."""
 import base64
 import concurrent.futures
+import os
 import hashlib
 import json
 from pathlib import Path
@@ -16,7 +17,13 @@ def fetch(item):
     if path.exists():
         data = path.read_bytes()
     else:
-        request = urllib.request.Request(url, headers={'User-Agent': 'sheng-offline-adreno-audit'})
+        headers = {'User-Agent': 'sheng-offline-adreno-audit'}
+        # Unauthenticated api.github.com allows 60 requests per hour and the shared
+        # runner addresses exhaust that; a workflow token raises it to 1000.
+        token = os.environ.get('GITHUB_TOKEN') or os.environ.get('GH_TOKEN')
+        if token and 'api.github.com' in url:
+            headers['Authorization'] = 'Bearer ' + token
+        request = urllib.request.Request(url, headers=headers)
         with urllib.request.urlopen(request, timeout=30) as response:
             data = response.read()
         if blob:
