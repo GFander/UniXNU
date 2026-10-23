@@ -7,6 +7,13 @@ import os
 from pathlib import Path
 import urllib.request
 
+def _auth(url):
+    """Attach the workflow token: unauthenticated api.github.com allows 60/hour."""
+    token = os.environ.get('GITHUB_TOKEN') or os.environ.get('GH_TOKEN')
+    if token and 'api.github.com' in url:
+        return urllib.request.Request(url, headers={'Authorization': 'Bearer ' + token})
+    return url
+
 # Tags of the Apple sources that still carry the headers newer xnu omits; feeds.toml sets them for the unixnu driver.
 TAG = os.environ.get('UNIXNU_DRIVERKIT_TAG', 'xnu-10063.121.3')
 TRUST_TAG = os.environ.get('UNIXNU_TRUSTCACHE_TAG', 'xnu-8796.101.5')
@@ -22,7 +29,7 @@ def restore(entry, destination=DESTINATION, tag=TAG):
     target = destination / name
     if target.exists():
         return None
-    data = urllib.request.urlopen(entry['download_url'], timeout=30).read()
+    data = urllib.request.urlopen(_auth(entry['download_url']), timeout=30).read()
     digest = hashlib.sha1(b'blob ' + str(len(data)).encode() + b'\0' + data).hexdigest()
     if digest != entry['sha']:
         raise ValueError(f'Git blob hash mismatch: {entry["name"]}')
