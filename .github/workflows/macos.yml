@@ -127,7 +127,7 @@ jobs:
         run: |
           for f in out/*/logs/*.log; do
             echo "===== $f ====="
-            tail -120 "$f"
+            grep -nE "error|Error|KEBAB|MASTER|No such|cannot|undefined" "$f" | tail -60
           done
 
       - name: Build userdata
