@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Qualify actual original RenderBox queue queries up to its next real refusal."""
 import argparse
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 import hashlib
 import json
 from pathlib import Path
@@ -20,7 +28,7 @@ def require(value,message):
 subprocess.run(['python3',ROOT/'scripts/audit-target-renderbox-device.py'],check=True,timeout=60,capture_output=True)
 sys.path.insert(0,str(ROOT/'kits/NativePrelink'));from native_prelink import macho,backed_offset
 kernel=ROOT/('build/native-prelink/native-owner-offline-gpu-texture-copy-candidate.macho' if a.stencil_texture_refusal else 'build/native-prelink/native-owner-offline-gpu-enqueue-candidate.macho' if a.enqueue else 'build/native-prelink/native-owner-offline-gpu-priority-candidate.macho');plan=load(kernel.with_suffix('.json'));raw=kernel.read_bytes();image=macho(raw)
-require(sha(kernel)==plan['candidate_sha256'] and sha(ROOT/'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf')==plan['native_sha256'],'Exact current native kernel and original-component candidate')
+require(sha(kernel)==plan['candidate_sha256'] and sha(ROOT/'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/mach.development.bcm2837.unstripped.noctf')==plan['native_sha256'],'Exact current native kernel and original-component candidate')
 for module,digest in plan['original_executable_sha256'].items():
     e=next(e for e in plan['extents'] if e['module']==module and e['segment']=='__TEXT_EXEC');at=backed_offset(image['segments'],e['va'],e['size'],len(raw))
     require(hashlib.sha256(raw[at:at+e['size']]).hexdigest()==digest,'Whole original executable remains unchanged '+module)

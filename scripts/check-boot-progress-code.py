@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Inspect real ARM64 instructions; compile all hook callers with hooks disabled."""
 import hashlib
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 import json
 from pathlib import Path
 import re
@@ -25,7 +33,7 @@ for obj in objects:
         assert re.search(r'\bmrs\s+x\d+, CNTFRQ_EL0',text)
         assert re.search(r'msr\s+DAIFSet, #0xf\s*\n.*dsb\s+sy',text), 'Freeze must mask IRQs AND complete framebuffer stores'
         assert 'wfe' in text
-base=root/'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837'
+base=root/'build/xnu/ios-obj/' + _xnu_obj_dir_name() + ''
 checked=[]
 for area,names in [('osfmk',['arm_init','startup','video_console','serial_console','sleh']),
                    ('bsd',['bsd_init','kern_exec','kern_exit']),('pexpert',['pe_kprintf'])]:

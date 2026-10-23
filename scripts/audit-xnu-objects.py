@@ -1,11 +1,19 @@
 #!/usr/bin/env python3
 """Audit the actual XNU target objects, independent of stale compiler JSON."""
 import json
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 from pathlib import Path
 import struct
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET = ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837'
+TARGET = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + ''
 objects = []
 failures = []
 non_macho = []

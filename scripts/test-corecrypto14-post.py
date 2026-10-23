@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Require real crypto registration and refusal of a corrupted POST HMAC."""
 import argparse
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 import hashlib
 import json
 from pathlib import Path
@@ -10,7 +18,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--check-existing', action='store_true', help='Validate captured runs without repeating QEMU')
-parser.add_argument('--kernel', type=Path, default=ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf')
+parser.add_argument('--kernel', type=Path, default=ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/mach.development.bcm2837.unstripped.noctf')
 args = parser.parse_args()
 kernel = args.kernel.resolve()
 original = kernel.read_bytes()

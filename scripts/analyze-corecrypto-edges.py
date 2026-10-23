@@ -5,6 +5,14 @@ This is a partial static survey. It cannot recover stripped relocations,
 prove ABI compatibility, or make the extracted bytes loadable.
 """
 import argparse
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 import json
 from pathlib import Path
 import struct
@@ -12,7 +20,7 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 stock = ROOT / '.cache/firmware/kernelcache.macho/kernelcache.release.ipad7.decompressed'
-baseline = ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf'
+baseline = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/mach.development.bcm2837.unstripped.noctf'
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--bundle', default='com.apple.kec.corecrypto')
 args = parser.parse_args()

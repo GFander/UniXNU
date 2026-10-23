@@ -7,6 +7,14 @@ sheng hardware. Both observations must show native 4K translation and the real
 source crypto provider before platform matching.
 """
 import argparse
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 import json
 from pathlib import Path
 import subprocess
@@ -22,7 +30,7 @@ args = parser.parse_args()
 
 configure = ROOT / 'build/darwinboot-armdt-platform'
 bsd = ROOT / 'build/darwinboot-armdt-bsd'
-kernel = ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf'
+kernel = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/mach.development.bcm2837.unstripped.noctf'
 
 if not args.check_existing:
     subprocess.run(['python3', ROOT / 'scripts/probe-darwinboot-xnu.py',

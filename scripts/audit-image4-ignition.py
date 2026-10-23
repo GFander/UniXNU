@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Locate the unchanged target Image4 ignition handler and its real kernel calls."""
 import argparse
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 import hashlib
 import json
 from pathlib import Path
@@ -38,7 +46,7 @@ def read(image, segments, va, length):
     return image[at:at + length]
 
 
-obj = ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/bsd/DEVELOPMENT/kern_newsysctl.o'
+obj = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/bsd/DEVELOPMENT/kern_newsysctl.o'
 dwarf = subprocess.check_output(['xcrun', 'dwarfdump', '--name=sysctl_oid', '--show-children', obj], text=True)
 layout = {}
 for member in dwarf.split('DW_TAG_member')[1:]:

@@ -6,6 +6,14 @@ four compiler objects must still match. This accepts retained prelink candidates
 without silently borrowing the offsets/entrypoints of a subsequently rebuilt one.
 """
 import argparse
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 import hashlib
 import json
 import mmap
@@ -37,7 +45,7 @@ def require(condition, message):
 require(plan['native_sha256'] == report['native_sha256'], 'Layout plan belongs to a different native kernel')
 require(hashlib.sha256(a.kernel.read_bytes()).hexdigest() == report['candidate_sha256'], 'Candidate differs from prelink report')
 require(plan['original_files_modified'] is False, 'Original images must remain unchanged')
-objects = ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837'
+objects = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + ''
 for key, relative in [('thread', 'osfmk/DEVELOPMENT/thread.o'), ('proc', 'bsd/DEVELOPMENT/kern_proc.o'),
                       ('task', 'osfmk/DEVELOPMENT/task.o'), ('region', 'osfmk/DEVELOPMENT/vm_shared_region.o')]:
     require(hashlib.sha256((objects / relative).read_bytes()).hexdigest() == plan['process_layout'][key + '_object_sha256'],

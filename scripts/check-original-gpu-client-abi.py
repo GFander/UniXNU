@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Check genuine original userclient lifecycle/refusal without a publication claim."""
 import hashlib,json,struct,sys
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'kits/NativePrelink'))
 from native_prelink import macho,backed_offset,exports
@@ -10,7 +18,7 @@ def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def require(ok,why):
  if not ok:raise SystemExit(why)
 base=ROOT/'build/native-prelink/native-owner-original-client-abi-candidate';plan=load(base.with_suffix('.json'));raw=base.with_suffix('.macho').read_bytes();segments=macho(raw)['segments']
-require(sha(base.with_suffix('.macho'))==plan['candidate_sha256'] and sha(ROOT/'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf')==plan['native_sha256'],'Exact current native kernel/candidate')
+require(sha(base.with_suffix('.macho'))==plan['candidate_sha256'] and sha(ROOT/'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/mach.development.bcm2837.unstripped.noctf')==plan['native_sha256'],'Exact current native kernel/candidate')
 reference=load(ROOT/'build/native-prelink/native-owner-metal-shared-events-candidate.json');require(plan['components']==reference['components'] and plan['original_executable_sha256']==reference['original_executable_sha256'] and plan['early_security_initializers']==reference['early_security_initializers'],'Same 29 unchanged original components/security entry')
 for module,digest in plan['original_executable_sha256'].items():
  e=next(e for e in plan['extents'] if e['module']==module and e['segment']=='__TEXT_EXEC');o=backed_offset(segments,e['va'],e['size'],len(raw));require(hashlib.sha256(raw[o:o+e['size']]).hexdigest()==digest,'Actual whole original executable identity '+module)

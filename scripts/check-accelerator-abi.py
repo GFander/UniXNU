@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Qualify actual original-base construction/lifetime and two real unpublished controls."""
 import hashlib,json,re,struct,subprocess,sys
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'kits/NativePrelink'))
 from native_prelink import macho,backed_offset,exports
@@ -9,7 +17,7 @@ def require(v,s):
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def load(p):return json.loads(p.read_text())
 base=ROOT/'build/native-prelink/native-owner-accelerator-abi-candidate';plan=load(base.with_suffix('.json'));raw=base.with_suffix('.macho').read_bytes();im=macho(raw)
-require(hashlib.sha256(raw).hexdigest()==plan['candidate_sha256'] and sha(ROOT/'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf')==plan['native_sha256'],'Exact current native and immutable candidate')
+require(hashlib.sha256(raw).hexdigest()==plan['candidate_sha256'] and sha(ROOT/'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/mach.development.bcm2837.unstripped.noctf')==plan['native_sha256'],'Exact current native and immutable candidate')
 old=load(ROOT/'build/native-prelink/native-owner-offline-gpu-broker-cpu-candidate.json')
 require(plan['components']==old['components'] and plan['original_executable_sha256']==old['original_executable_sha256'] and plan['early_security_initializers']==old['early_security_initializers'],'Same original component/security initialization closure')
 for module,digest in plan['original_executable_sha256'].items():

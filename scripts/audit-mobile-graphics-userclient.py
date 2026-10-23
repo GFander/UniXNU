@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Qualify the unchanged target's mobile framebuffer dispatch contract on host."""
 import hashlib
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 import json
 from pathlib import Path
 import re
@@ -54,7 +62,7 @@ def address_pair(pc, register):
 
 require(hashlib.sha256(read(text['va'], text['size'])).hexdigest() ==
         plan['original_executable_sha256']['com.apple.iokit.IOMobileGraphicsFamily'], 'Original executable bytes changed')
-obj = ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/iokit/DEVELOPMENT/IOUserClient.cpo'
+obj = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/iokit/DEVELOPMENT/IOUserClient.cpo'
 layouts = {}
 for name, size, members in (
         ('IOExternalMethodDispatch', 24, dict(function=0, checkScalarInputCount=8,

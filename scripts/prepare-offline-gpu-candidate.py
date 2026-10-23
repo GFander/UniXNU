@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Emit a fresh immutable offline candidate with exactly the retained original components."""
 import argparse
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 import hashlib
 import json
 from pathlib import Path
@@ -9,7 +17,7 @@ ROOT=Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser(description=__doc__);p.add_argument('--output',required=True,type=Path);a=p.parse_args()
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 base=ROOT/'build/native-prelink/native-owner-offline-gpu-broker-cpu-candidate.json';old=json.loads(base.read_text())
-kernel=ROOT/'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf'
+kernel=ROOT/'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/mach.development.bcm2837.unstripped.noctf'
 original=ROOT/'.cache/firmware/kernelcache.macho/kernelcache.release.ipad7.decompressed';output=a.output.resolve()
 if output.exists() or output.with_suffix('.json').exists():raise SystemExit('Refuse to overwrite any existing candidate or report')
 if sha(original)!=old['original_sha256'] or sha(base.with_suffix('.macho'))!=old['candidate_sha256']:raise SystemExit('Exact original target and retained base candidate required')

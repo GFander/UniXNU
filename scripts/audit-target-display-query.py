@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Bind an offline display-query observation plan to unchanged target images."""
 import hashlib
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 import argparse
 import json
 import mmap
@@ -184,7 +192,7 @@ plan = dict(mode='query', expected_process='SpringBoard', launchd_sha256=hashlib
     query=query, query_prefix=read(query, 16).hex(), port_checkpoint=0x38, reply_checkpoint=0x54, return_checkpoint=0x460,
     main_display=0x1f491b488, displays=0x1f491b498, cas_request_id=request,
     original_files_modified=False, static_only=True)
-objects = ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837'
+objects = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + ''
 thread_object = objects / 'osfmk/DEVELOPMENT/thread.o'
 proc_object = objects / 'bsd/DEVELOPMENT/kern_proc.o'
 

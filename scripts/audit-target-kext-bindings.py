@@ -6,6 +6,14 @@ or a complete relocation recipe. PC-relative references and ABI compatibility
 remain separate requirements. No target bytes or signatures are changed.
 """
 import argparse
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 from collections import Counter
 import hashlib
 import json
@@ -20,7 +28,7 @@ args = parser.parse_args()
 folder = ROOT / 'build/target-kexts' / args.bundle
 metadata = json.loads((folder / 'segments.json').read_text())
 stock = ROOT / '.cache/firmware/kernelcache.macho/kernelcache.release.ipad7.decompressed'
-baseline = ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/mach.development.bcm2837.unstripped.noctf'
+baseline = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/mach.development.bcm2837.unstripped.noctf'
 data = stock.read_bytes()
 if hashlib.sha256(data).hexdigest() != 'f18b4df865405f2a287b84977d7aca745e056d656d9fc9df1662970ce2969de7':
     raise SystemExit('Wrong target kernelcache')

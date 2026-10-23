@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Cross-build a bounded real-XNU crypto probe, with ignored original inputs."""
 import argparse
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 import hashlib
 import json
 from pathlib import Path
@@ -117,7 +125,7 @@ _verified_root_policies:
         policy_records.append(policy_records[0].copy())
     bundle_assembly += '_verified_root_policy_count:\n.quad ' + str(len(policy_records)) + '\n'
     assembly.write_text(assembly.read_text() + bundle_assembly)
-recipe = ROOT / 'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/bsd/DEVELOPMENT/bsd_init.o.json'
+recipe = ROOT / 'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/bsd/DEVELOPMENT/bsd_init.o.json'
 record = json.loads(recipe.read_text().strip().rstrip(','))
 objects = []
 for source in (ROOT / 'kits/VerifiedRoot/src/verified_root.c', ROOT / 'kits/VerifiedRoot/adapters/xnu_crypto.c',

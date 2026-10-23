@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 """Derive the supplied original Sandbox I/O Kit hook and genuine class walk."""
 import hashlib,json,re,runpy,struct,subprocess
+
+def _xnu_obj_dir_name(root='.'):
+    """Name of this tree's kernel object directory, whatever machine config it used."""
+    base = Path(root) / 'build/xnu/ios-obj'
+    found = sorted(base.glob('DEVELOPMENT_ARM64_*'))
+    return found[0].name if found else 'DEVELOPMENT_ARM64_BCM2837'
+
+
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 n=runpy.run_path(str(ROOT/'scripts/audit-target-accelerator-base.py'))
@@ -9,7 +17,7 @@ es=[e for e in n['plan']['extents'] if e['module']=='com.apple.security.sandbox'
 text=next(e for e in es if e['segment']=='__TEXT_EXEC');code=read(text['va'],text['size'])
 digest=hashlib.sha256(code).hexdigest()
 require(digest==n['plan']['original_executable_sha256']['com.apple.security.sandbox'],'Exact complete supplied original Sandbox executable')
-obj=ROOT/'build/xnu/ios-obj/DEVELOPMENT_ARM64_BCM2837/security/DEVELOPMENT/mac_vfs.o'
+obj=ROOT/'build/xnu/ios-obj/' + _xnu_obj_dir_name() + '/security/DEVELOPMENT/mac_vfs.o'
 layouts={}
 for typename,fields in (('mac_policy_conf',('mpc_name','mpc_fullname','mpc_ops')),('mac_policy_ops',('mpo_iokit_check_open','mpo_iokit_check_open_service'))):
  dwarf=subprocess.check_output(['xcrun','dwarfdump','--name='+typename,'--show-children',obj],text=True)
