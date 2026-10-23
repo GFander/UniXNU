@@ -210,7 +210,15 @@ new file mode 100644
 diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
 --- a/osfmk/arm/arm_init.c
 +++ b/osfmk/arm/arm_init.c
-@@ -220,6 +220,7 @@
+@@ -76,6 +76,7 @@
+ #include <sys/kdebug.h>
+ 
+ #include <pexpert/pexpert.h>
++#include <arm64/kebab_early.h>
+ 
+ #include <console/serial_protos.h>
+ 
+@@ -220,6 +221,7 @@
  static void
  arm_slide_rebase_and_sign_image(void)
  {
@@ -218,7 +226,7 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  	kernel_mach_header_t *k_mh, *kc_mh = NULL;
  	kernel_segment_command_t *seg;
  	uintptr_t slide;
-@@ -442,6 +443,7 @@
+@@ -442,6 +444,7 @@
  #endif
  
  	ml_parse_cpu_topology();
@@ -226,7 +234,7 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  
  
  	master_cpu = ml_get_boot_cpu_number();
-@@ -471,11 +473,13 @@
+@@ -471,11 +474,13 @@
  	 */
  	thread->machine.preemption_count = 0;
  	cpu_bootstrap();
@@ -240,7 +248,7 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  
  	/*
  	 * Initialize the timer callout world
-@@ -483,6 +487,7 @@
+@@ -483,6 +488,7 @@
  	timer_call_init();
  
  	cpu_init();
@@ -248,7 +256,7 @@ diff --git a/osfmk/arm/arm_init.c b/osfmk/arm/arm_init.c
  
  	processor_bootstrap();
  
-@@ -532,6 +537,7 @@
+@@ -532,6 +538,7 @@
  #endif  /* __ARM_PAN_AVAILABLE__ */
  
  	boot_progress_stage("arm_vm_init enter");
