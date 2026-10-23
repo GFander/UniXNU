@@ -36,8 +36,7 @@ fi
 # The same holds for the boot-time GPU addon mount and the staged system apps copy (zzy), which edit the owner Data mount function
 # inside the systemos patch. Reverse newest first; the loop below re-applies them in name order.
 for LATE_PATCH in "$ROOT/patches/xnu/zzz-boot-progress.patch" "$ROOT/patches/xnu/zzy-staged-system-apps.patch" \
-    "$ROOT/patches/xnu/zzy-native-gpu-addon-mount.patch" \
-    "$ROOT/patches/xnu/kebab-early-console.patch.off"; do
+    "$ROOT/patches/xnu/zzy-native-gpu-addon-mount.patch"; do
   if git -C .cache/xnu-work apply --reverse --check "$LATE_PATCH" >/dev/null 2>&1; then
     git -C .cache/xnu-work apply --reverse "$LATE_PATCH"
   fi
@@ -51,10 +50,15 @@ done
 # The kebab early console is applied outside the glob above: it must not take
 # part in the reverse/reapply dance that the two-pass build performs for the
 # zzz/zzy patches, which share files with it.
-KEBAB_EARLY="$ROOT/patches/xnu/kebab-early-console.patch.off"
-if [ -f "$KEBAB_EARLY" ]; then
-  if ! git -C .cache/xnu-work apply --reverse --check "$KEBAB_EARLY" >/dev/null 2>&1; then
-    git -C .cache/xnu-work apply "$KEBAB_EARLY"
+# Only in the final pass: the bootstrap pass exists to produce the compile
+# records, and patching the tree there makes the late-patch reverse/reapply
+# dance below see context it cannot reverse.
+if [ "${XNU_BOOTSTRAP:-0}" != 1 ]; then
+  KEBAB_EARLY="$ROOT/patches/xnu/kebab-early-console.patch.off"
+  if [ -f "$KEBAB_EARLY" ]; then
+    if ! git -C .cache/xnu-work apply --reverse --check "$KEBAB_EARLY" >/dev/null 2>&1; then
+      git -C .cache/xnu-work apply "$KEBAB_EARLY"
+    fi
   fi
 fi
 export XNU_AVAILABILITY_PL=$ROOT/.cache/fakeroot/usr/local/libexec/availability.pl
