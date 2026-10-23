@@ -113,6 +113,16 @@ for header in Path('refer/libdispatch/os').glob('*.h'):
     if not target.exists() or target.read_bytes() != result.stdout:
         target.write_bytes(result.stdout)
 PY
+# bsd/sys/make_symbol_aliasing.sh looks for availability.pl under the SDK it
+# is handed, and installhdrs is invoked with SDKROOT=macosx, so the tool that
+# AvailabilityVersions installed into the fakeroot has to be visible there.
+if [ -x "$KERNEL_SDKROOT/usr/local/libexec/availability.pl" ]; then
+  SDK_USR_LOCAL=$(xcrun --sdk macosx --show-sdk-path)/usr/local/libexec
+  sudo mkdir -p "$SDK_USR_LOCAL" 2>/dev/null || true
+  sudo ln -sf "$KERNEL_SDKROOT/usr/local/libexec/availability.pl" \
+    "$SDK_USR_LOCAL/availability.pl" 2>/dev/null || true
+fi
+
 if [ ! -f "$KERNEL_SDKROOT/.xnu-$XNU_VERSION-headers" ]; then
   make -C .cache/xnu-work installhdrs SDKROOT=macosx ARCH_CONFIGS=ARM64 \
     MACHINE_CONFIGS=KEBAB KERNEL_CONFIGS=DEVELOPMENT \
