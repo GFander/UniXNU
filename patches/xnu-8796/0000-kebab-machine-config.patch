@@ -100,6 +100,27 @@ index 0000000..1ed75ee
 +options   CONFIG_KERNEL_INTEGRITY		# <kernel_integrity>
 +options   CONFIG_UBSAN_MINIMAL		# <ubsan_minimal>
 +options   CONFIG_KERNEL_TBI	# <kernel_tbi>
+diff --git a/makedefs/MakeInc.def b/makedefs/MakeInc.def
+index 5bd6f23..a802ff6 100644
+--- a/makedefs/MakeInc.def
++++ b/makedefs/MakeInc.def
+@@ -29,7 +29,7 @@ SUPPORTED_ARM64_MACHINE_CONFIGS = NONE
+ else ifneq ($(findstring _host,$(RC_ProjectName)),)
+ SUPPORTED_ARM64_MACHINE_CONFIGS = NONE
+ else
+-SUPPORTED_ARM64_MACHINE_CONFIGS = BCM2837 T6000 T8101 T8103 VMAPPLE
++SUPPORTED_ARM64_MACHINE_CONFIGS = BCM2837 KEBAB T6000 T8101 T8103 VMAPPLE
+ 
+ endif
+ 
+@@ -61,6 +61,7 @@ MACHINE_FLAGS_ARM64_T8103 = -DARM64_BOARD_CONFIG_T8103                  -mcpu=ap
+ MACHINE_FLAGS_ARM64_T6000 = -DARM64_BOARD_CONFIG_T6000 		-mcpu=apple-a14
+ MACHINE_FLAGS_ARM64_VMAPPLE = -DARM64_BOARD_CONFIG_VMAPPLE              -march=armv8.5a
+ MACHINE_FLAGS_ARM64_BCM2837 = -DARM64_BOARD_CONFIG_BCM2837
++MACHINE_FLAGS_ARM64_KEBAB = -DARM64_BOARD_CONFIG_KEBAB -D__ARM_16K_PG__
+ 
+ 
+ #
 diff --git a/pexpert/pexpert/arm64/KEBAB.h b/pexpert/pexpert/arm64/KEBAB.h
 new file mode 100644
 index 0000000..26952e3
