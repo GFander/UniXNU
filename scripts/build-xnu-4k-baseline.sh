@@ -47,6 +47,15 @@ for PATCH in "$ROOT"/patches/xnu/*.patch "$ROOT"/kits/NativePrelink/patches/*.pa
     git -C .cache/xnu-work apply "$PATCH"
   fi
 done
+# The kebab early console is applied outside the glob above: it must not take
+# part in the reverse/reapply dance that the two-pass build performs for the
+# zzz/zzy patches, which share files with it.
+KEBAB_EARLY="$ROOT/patches/xnu/kebab-early-console.patch.off"
+if [ -f "$KEBAB_EARLY" ]; then
+  if ! git -C .cache/xnu-work apply --reverse --check "$KEBAB_EARLY" >/dev/null 2>&1; then
+    git -C .cache/xnu-work apply "$KEBAB_EARLY"
+  fi
+fi
 export XNU_AVAILABILITY_PL=$ROOT/.cache/fakeroot/usr/local/libexec/availability.pl
 python3 scripts/prepare-xnu-source.py
 # The first pass of a new tree (XNU_BOOTSTRAP=1, set by the unixnu driver) only has to leave the compile records and
