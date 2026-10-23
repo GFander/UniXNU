@@ -144,7 +144,7 @@ jobs:
           for f in out/*/logs/*.log; do
             echo "===== $f ====="
             case "$f" in
-              *kernel.log) tail -45 "$f" ;;
+              *kernel.log) sed -n "/Undefined symbols/,/symbol(s) not found/p" "$f" | head -40 ;;
               *) grep -nE -B3 "error:|\*\*\*" "$f" | tail -15 ;;
             esac
           done
