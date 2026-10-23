@@ -117,10 +117,15 @@ PY
 # is handed, and installhdrs is invoked with SDKROOT=macosx, so the tool that
 # AvailabilityVersions installed into the fakeroot has to be visible there.
 if [ -x "$KERNEL_SDKROOT/usr/local/libexec/availability.pl" ]; then
-  SDK_USR_LOCAL=$(xcrun --sdk macosx --show-sdk-path)/usr/local/libexec
-  sudo mkdir -p "$SDK_USR_LOCAL" 2>/dev/null || true
-  sudo ln -sf "$KERNEL_SDKROOT/usr/local/libexec/availability.pl" \
-    "$SDK_USR_LOCAL/availability.pl" 2>/dev/null || true
+  # Both the macOS SDK (installhdrs) and the iPhoneOS SDK (the kernel build)
+  # are searched for it by bsd/sys/make_symbol_aliasing.sh.
+  for SDK_NAME in macosx iphoneos; do
+    SDK_USR_LOCAL=$(xcrun --sdk "$SDK_NAME" --show-sdk-path 2>/dev/null)/usr/local/libexec
+    [ -n "$SDK_USR_LOCAL" ] || continue
+    sudo mkdir -p "$SDK_USR_LOCAL" 2>/dev/null || true
+    sudo ln -sf "$KERNEL_SDKROOT/usr/local/libexec/availability.pl" \
+      "$SDK_USR_LOCAL/availability.pl" 2>/dev/null || true
+  done
 fi
 
 if [ ! -f "$KERNEL_SDKROOT/.xnu-$XNU_VERSION-headers" ]; then
