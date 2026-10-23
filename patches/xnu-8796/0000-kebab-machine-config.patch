@@ -1,9 +1,15 @@
 diff --git a/config/MASTER.arm64.kebab b/config/MASTER.arm64.kebab
 new file mode 100644
-index 0000000..1ed75ee
+index 0000000..a08e473
 --- /dev/null
 +++ b/config/MASTER.arm64.kebab
-@@ -0,0 +1,96 @@
+@@ -0,0 +1,114 @@
++#
++# kebab (OnePlus 8T, SM8250): MASTER.arm64.MacOSX plus the open-source
++# arm64 assembly and pmap (nos_arm_asm, nos_arm_pmap). Apple's own SoC configs
++# link those from the KDK's closed lib<SOC>.os.<CONFIG>.a instead, which is
++# arm64e and Apple-silicon specific. kpc is dropped: it programs Apple's PMU.
++#
 +#
 +# Mach Operating System
 +# Copyright (c) 1986 Carnegie-Mellon University
@@ -11,75 +17,82 @@ index 0000000..1ed75ee
 +#
 +# All rights reserved.  The CMU software License Agreement
 +# specifies the terms and conditions for use and redistribution.
-+#
++#  
 +######################################################################
 +#
 +#  Master Apple configuration file (see the master machine independent
 +#  configuration file for a description of the file format).
 +#
 +######################################################################
-+#
++#  
 +#  Standard Apple OS Configurations:
 +#  -------- ----- -- ---------------
 +#
-+#  KERNEL_BASE =    [ arm64 config_pmap_ppl xsmall msgb_small config_embedded config_requires_u32_munging ARM_EXTRAS_BASE ]
++#  KERNEL_BASE =    [ arm64 config_pmap_ppl medium msgb_large config_requires_u32_munging config_delay_idle_sleep config_proc_udata_storage config_uexc config_darkboot nos_arm_asm nos_arm_pmap ]
 +#  KERNEL_RELEASE = [ KERNEL_BASE ]
-+#  KERNEL_DEV =     [ KERNEL_BASE development mach_assert config_xnupost proc_ref_debug ]
-+#  KERNEL_DEBUG =   [ KERNEL_BASE debug mach_assert config_xnupost config_waitq_stats config_workloop_debug ]
-+#  BSD_BASE =       [ mach_bsd psynch config_proc_uuid_policy config_personas ]
-+#  BSD_RELEASE =    [ BSD_BASE no_printf_str no_kprintf_str secure_kernel ]
-+#  BSD_DEV =        [ BSD_BASE config_netboot config_imageboot config_coredump pgo config_vnguard ]
-+#  BSD_DEBUG =      [ BSD_BASE config_netboot config_imageboot config_coredump pgo config_vnguard ]
-+#  FILESYS_BASE =   [ devfs fifo fs_compression config_protect config_mnt_rootsnap config_fse routefs namedstreams bindfs]
++#  KERNEL_DEV =     [ KERNEL_BASE development mach_assert config_xnupost proc_ref_debug config_proc_resource_limits ]
++#  KERNEL_DEBUG =   [ KERNEL_BASE debug mach_assert config_xnupost config_waitq_stats config_workloop_debug config_proc_resource_limits ]
++#  BSD_BASE =       [ mach_bsd sysv_sem sysv_msg sysv_shm config_netboot config_imageboot psynch config_proc_uuid_policy config_coredump pgo config_personas ]
++#  BSD_RELEASE =    [ BSD_BASE ]
++#  BSD_DEV =        [ BSD_BASE config_vnguard ]
++#  BSD_DEBUG =      [ BSD_BASE config_vnguard ]
++#  FILESYS_BASE =   [ devfs fdesc fifo fs_compression config_protect config_mnt_rootsnap config_rosv_startup config_mount_vm config_mount_prebootrecovery config_basesystemroot config_fse quota namedstreams config_imgsrc_access config_triggers config_ext_resolver config_searchfs config_volfs config_appledouble nullfs config_mnt_suid config_firmlinks config_dataless_files config_union_mounts config_file_leases ]
 +#  FILESYS_RELEASE= [ FILESYS_BASE ]
-+#  FILESYS_DEV =    [ FILESYS_BASE config_union_mounts fdesc ]
-+#  FILESYS_DEBUG =  [ FILESYS_BASE config_union_mounts fdesc ]
-+#  NFS_DEV =        [ nfsserver ]
++#  FILESYS_DEV =    [ FILESYS_BASE config_iocount_trace ]
++#  FILESYS_DEBUG =  [ FILESYS_BASE config_iocount_trace ]
++#  NFS =            [ nfsserver ]
 +#  SKYWALK_BASE =   [ skywalk config_nexus_user_pipe config_nexus_kernel_pipe config_nexus_monitor config_nexus_flowswitch config_nexus_netif ]
 +#  SKYWALK_RELEASE = [ SKYWALK_BASE ]
 +#  SKYWALK_DEV =    [ SKYWALK_BASE ]
 +#  SKYWALK_DEBUG =  [ SKYWALK_BASE ]
-+#  NETWORKING =     [ inet bpfilter if_bridge traffic_mgt dummynet ah_all_crypto if_fake ]
++#  NETWORKING =     [ inet bpfilter dummynet traffic_mgt sendfile ah_all_crypto bond vlan gif stf ifnet_input_chk config_mbuf_jumbo if_bridge MULTIPATH if_fake remote_vif ]
 +#  NETWORKING_RELEASE = [ NETWORKING ]
 +#  NETWORKING_DEV = [ NETWORKING_RELEASE packet_mangler if_headless ]
 +#  NETWORKING_DEBUG = [ NETWORKING_DEV ]
 +#  VPN =            [ ipsec flow_divert necp content_filter ]
-+#  PF =             [ pf ]
++#  PF =             [ pf pflog ]
 +#  MULTIPATH =      [ multipath mptcp ]
-+#  IOKIT_BASE =     [ iokit iokitcpp no_kextd no_kernel_hid config_sleep ]
++#if SOC_CONFIG_t8020 || SOC_IS_VIRTUALIZED
++#  HIBERNATION =    [ ]
++#else /*!(SOC_CONFIG_t8020 || SOC_IS_VIRTUALIZED)*/
++#  HIBERNATION =    [ ]
++#endif /*SOC_CONFIG_t8020 || SOC_IS_VIRTUALIZED*/
++#  IOKIT_BASE =     [ iokit iokitcpp no_kernel_hid config_sleep iokitstats HIBERNATION ]
 +#  IOKIT_RELEASE =  [ IOKIT_BASE ]
-+#  IOKIT_DEV =      [ IOKIT_BASE iokitstats iotracking ]
-+#  IOKIT_DEBUG =    [ IOKIT_BASE iokitstats iotracking]
-+#  LIBKERN_BASE =   [ libkerncpp config_blocks config_kec_fips zlib crypto_sha2 ]
-+#  LIBKERN_RELEASE =[ LIBKERN_BASE ]
-+#  LIBKERN_DEV =    [ LIBKERN_BASE iotracking ]
-+#  LIBKERN_DEBUG =  [ LIBKERN_BASE iotracking ]
-+#  PERF_DBG_BASE =  [ mach_kdp config_serial_kdp kperf kpc ]
++#  IOKIT_DEV =      [ IOKIT_BASE iotracking ]
++#  IOKIT_DEBUG =    [ IOKIT_BASE iotracking ]
++#  LIBKERN_BASE =   [ libkerncpp config_blocks config_kec_fips crypto_sha2 config_img4 ]
++#  LIBKERN_RELEASE =[ LIBKERN_BASE zlib ]
++#  LIBKERN_DEV =    [ LIBKERN_BASE zlib iotracking ]
++#  LIBKERN_DEBUG =  [ LIBKERN_BASE zlib iotracking ]
++#  PERF_DBG_BASE =  [ config_dtrace mach_kdp config_serial_kdp kdp_interactive_debugging config_kdp_coredump_encryption config_pervasive_energy PERFMON_BASE kperf ]
 +#  PERF_DBG_RELEASE=[ PERF_DBG_BASE ist_kdebug ]
-+#  PERF_DBG_DEV =   [ PERF_DBG_BASE config_dtrace zleaks kdp_interactive_debugging alternate_debugger sched_hygiene_debug config_iotrace]
-+#  PERF_DBG_DEBUG = [ PERF_DBG_BASE config_dtrace zleaks kdp_interactive_debugging alternate_debugger sched_hygiene_debug config_iotrace]
-+#  MACH_BASE =      [ mach config_ecc_logging vc_progress_white importance_inheritance config_atm config_coalitions config_iosched config_library_validation config_sysdiagnose config_telemetry config_mach_bridge_recv_time config_quiesce_counter config_service_port_info ]
-+#  MACH_RELEASE =   [ MACH_BASE config_skip_precise_user_kernel_time debugger_for_zone_info ]
++#  PERF_DBG_DEV =   [ PERF_DBG_BASE lock_stats zleaks alternate_debugger sched_hygiene_debug config_debug_syscall_rejection config_iotrace ]
++#  PERF_DBG_DEBUG = [ PERF_DBG_BASE lock_stats zleaks alternate_debugger sched_hygiene_debug config_debug_syscall_rejection config_iotrace ]
++#if SOC_IS_VIRTUALIZED
++#  PARAVIRT_BASE =  [ config_pv_ticket ]
++#else
++#  PARAVIRT_BASE =  [ ]
++#endif /*SOC_IS_VIRTUALIZED*/
++#  MACH_BASE =      [ mach config_ecc_logging vc_progress_white importance_inheritance config_atm config_coalitions config_iosched config_sysdiagnose config_telemetry config_mach_bridge_recv_time config_quiesce_counter config_arm_pfz config_user_notification phys_write_acct config_service_port_info config_voucher_deprecated PARAVIRT_BASE config_ledger_interval_max ]
++#  MACH_RELEASE =   [ MACH_BASE ]
 +#  MACH_DEV =       [ MACH_BASE config_io_accounting importance_trace ]
 +#  MACH_DEBUG =     [ MACH_BASE config_io_accounting importance_trace importance_debug ]
-+#  SCHED_BASE =     [ config_sched_traditional config_sched_multiq config_sched_deferred_ast config_clutch config_taskwatch ]
++#  SCHED_BASE =     [ config_sched_traditional config_sched_multiq config_sched_deferred_ast config_clutch config_sched_sfi config_sched_auto_join config_preadopt_tg ]
 +#  SCHED_RELEASE =  [ SCHED_BASE ]
 +#  SCHED_DEV =      [ SCHED_BASE ]
 +#  SCHED_DEBUG =    [ SCHED_BASE config_sched_grrr config_sched_proto ]
-+#  VM_BASE =        [ vm_pressure_events jetsam freeze memorystatus config_code_decryption phantom_cache config_secluded_memory config_cs_validation_bitmap ]
++#  VM_BASE =        [ vm_pressure_events memorystatus config_code_decryption encrypted_swap config_deferred_reclaim ]
 +#  VM_RELEASE =     [ VM_BASE ]
-+#  VM_DEV =         [ VM_BASE dynamic_codesigning ubsan_minimal pgzalloc ]
-+#  VM_DEBUG =       [ VM_BASE dynamic_codesigning ubsan_minimal pgzalloc ]
-+#  VM_KASAN =       [ VM_BASE dynamic_codesigning config_kasan config_ubsan config_kcov config_ksancov kernel_tbi]
-+#  SECURITY_BASE =     [ config_macf kernel_integrity config_secure_bsd_root ]
-+#  SECURITY_RELEASE = [ SECURITY_BASE ]
-+#  SECURITY_DEV =     [ SECURITY_BASE config_setuid config_kas_info ]
-+#  SECURITY_DEBUG =   [ SECURITY_BASE config_setuid config_kas_info ]
-+#  BASE =           [ MULTIPATH PF VPN ]
-+#  RELEASE =        [ BASE KERNEL_RELEASE BSD_RELEASE FILESYS_RELEASE             SKYWALK_RELEASE NETWORKING_RELEASE IOKIT_RELEASE LIBKERN_RELEASE PERF_DBG_RELEASE MACH_RELEASE SCHED_RELEASE VM_RELEASE SECURITY_RELEASE ]
-+#  DEVELOPMENT =    [ BASE KERNEL_DEV     BSD_DEV     FILESYS_DEV     NFS_DEV     SKYWALK_DEV     NETWORKING_DEV     IOKIT_DEV     LIBKERN_DEV     PERF_DBG_DEV     MACH_DEV     SCHED_DEV     VM_DEV     SECURITY_DEV     ]
-+#  DEBUG =          [ BASE KERNEL_DEBUG   BSD_DEBUG   FILESYS_DEBUG               SKYWALK_DEBUG   NETWORKING_DEBUG   IOKIT_DEBUG   LIBKERN_DEBUG   PERF_DBG_DEBUG   MACH_DEBUG   SCHED_DEBUG   VM_DEBUG   SECURITY_DEBUG   ]
-+#  KASAN =          [ BASE KERNEL_DEV     BSD_DEV     FILESYS_DEV     NFS_DEV     SKYWALK_DEV     NETWORKING_DEV     IOKIT_DEV     LIBKERN_DEV     PERF_DBG_DEV     MACH_DEV     SCHED_DEV     VM_KASAN   SECURITY_DEV     ]
++#  VM_DEV =         [ VM_BASE dynamic_codesigning pgzalloc ]
++#  VM_DEBUG =       [ VM_BASE dynamic_codesigning pgzalloc ]
++#  VM_KASAN =       [ VM_BASE dynamic_codesigning config_kasan config_ubsan config_kcov config_ksancov kernel_tbi ]
++#  SECURITY =       [ config_macf config_audit kernel_integrity config_csr config_csr_from_dt config_setuid config_kas_info config_secure_bsd_root config_arcade config_supplemental_signatures second_static_trust_cache reslide_shared_cache ]
++#  BASE =           [ PF VPN SECURITY NFS ]
++#  RELEASE =        [ BASE KERNEL_RELEASE BSD_RELEASE FILESYS_RELEASE SKYWALK_RELEASE NETWORKING_RELEASE IOKIT_RELEASE LIBKERN_RELEASE    PERF_DBG_RELEASE MACH_RELEASE SCHED_RELEASE VM_RELEASE ]
++#  DEVELOPMENT =    [ BASE KERNEL_DEV     BSD_DEV     FILESYS_DEV     SKYWALK_DEV     NETWORKING_DEV     IOKIT_DEV     LIBKERN_DEV        PERF_DBG_DEV     MACH_DEV     SCHED_DEV     VM_DEV     ]
++#  DEBUG =          [ BASE KERNEL_DEBUG   BSD_DEBUG   FILESYS_DEBUG   SKYWALK_DEBUG   NETWORKING_DEBUG   IOKIT_DEBUG   LIBKERN_DEBUG      PERF_DBG_DEBUG   MACH_DEBUG   SCHED_DEBUG   VM_DEBUG   ]
++#  KASAN =          [ BASE KERNEL_DEV     BSD_DEV     FILESYS_DEV     SKYWALK_DEV     NETWORKING_DEV     IOKIT_DEV     LIBKERN_DEV        PERF_DBG_DEV     MACH_DEV     SCHED_DEV     VM_KASAN   ]
 +#
 +######################################################################
 +#
@@ -98,10 +111,15 @@ index 0000000..1ed75ee
 +options	  CONFIG_MACH_APPROXIMATE_TIME
 +
 +options   CONFIG_KERNEL_INTEGRITY		# <kernel_integrity>
-+options   CONFIG_UBSAN_MINIMAL		# <ubsan_minimal>
-+options   CONFIG_KERNEL_TBI	# <kernel_tbi>
++
++options CONFIG_MACF_LAZY_VNODE_LABELS   # Turn on labels, don't preallocate
++
++options CONFIG_HYPERVISOR_PUBLIC   # unrestricted entitlement for hypervisor
++
++options   CONFIG_RESLIDE_SHARED_CACHE		# <reslide_shared_cache>
++options   CONFIG_KERNEL_TBI		# <kernel_tbi>
 diff --git a/makedefs/MakeInc.def b/makedefs/MakeInc.def
-index 5bd6f23..0844899 100644
+index 5bd6f23..efc9870 100644
 --- a/makedefs/MakeInc.def
 +++ b/makedefs/MakeInc.def
 @@ -29,7 +29,7 @@ SUPPORTED_ARM64_MACHINE_CONFIGS = NONE
@@ -113,48 +131,14 @@ index 5bd6f23..0844899 100644
  
  endif
  
-@@ -61,6 +61,10 @@ MACHINE_FLAGS_ARM64_T8103 = -DARM64_BOARD_CONFIG_T8103                  -mcpu=ap
+@@ -61,6 +61,7 @@ MACHINE_FLAGS_ARM64_T8103 = -DARM64_BOARD_CONFIG_T8103                  -mcpu=ap
  MACHINE_FLAGS_ARM64_T6000 = -DARM64_BOARD_CONFIG_T6000 		-mcpu=apple-a14
  MACHINE_FLAGS_ARM64_VMAPPLE = -DARM64_BOARD_CONFIG_VMAPPLE              -march=armv8.5a
  MACHINE_FLAGS_ARM64_BCM2837 = -DARM64_BOARD_CONFIG_BCM2837
-+# KEBAB is its own processor macro: defining BCM2837 would also enable the
-+# Raspberry Pi UART driver in pexpert/arm/pe_serial.c.
 +MACHINE_FLAGS_ARM64_KEBAB = -DARM64_BOARD_CONFIG_KEBAB -D__ARM_16K_PG__ -DKEBAB
-+MACHINE_FLAGS_ARM64_KEBAB = -DARM64_BOARD_CONFIG_KEBAB -D__ARM_16K_PG__ -DBCM2837
  
  
  #
-diff --git a/makedefs/MakeInc.rule b/makedefs/MakeInc.rule
-index 59e4063..2ed1715 100644
---- a/makedefs/MakeInc.rule
-+++ b/makedefs/MakeInc.rule
-@@ -392,7 +392,7 @@ do_exporthdrs_md: $(EXPORT_MD_GEN_INC_FILES)  $(EXPORT_MD_INC_FILES)
- #
- 
- S_RULE_0=@$(LOG_AS) "$@"
--S_RULE_1A=$(_v)${S_KCC} -c ${SFLAGS} -MD -MF $(@:o=d) -MP ${$@_SFLAGS_ADD} ${INCFLAGS} ${$@_INCFLAGS}
-+S_RULE_1A=$(_v)${S_KCC} -c ${SFLAGS} -MD -MF $(@:o=d) -MJ $(@:o=o.json) -MP ${$@_SFLAGS_ADD} ${INCFLAGS} ${$@_INCFLAGS}
- S_RULE_1B=$(<F)
- S_RULE_2=
- 
-@@ -400,7 +400,7 @@ S_RULE_2=
- # Compilation rules to generate .o from .c for normal files
- #
- C_RULE_0=@$(LOG_CC) "$@"
--C_RULE_1A=$(_v)${KCC} -c ${filter-out ${$@_CFLAGS_RM}, ${CFLAGS} ${CWARNFLAGS}} -MD -MF $(@:o=d) -MP ${$@_CFLAGS_ADD} ${$@_CWARNFLAGS_ADD} ${INCFLAGS} ${$@_INCFLAGS}
-+C_RULE_1A=$(_v)${KCC} -c ${filter-out ${$@_CFLAGS_RM}, ${CFLAGS} ${CWARNFLAGS}} -MD -MF $(@:o=d) -MJ $(@:o=o.json) -MP ${$@_CFLAGS_ADD} ${$@_CWARNFLAGS_ADD} ${INCFLAGS} ${$@_INCFLAGS}
- C_RULE_1B=$(<F)
- C_RULE_2=
- 
-@@ -424,7 +424,7 @@ C_RULE_4B_D=${C_RULE_4B}
- #   The config tool slickly changes the last source filename char to 'o'
- #   for the object filename.
- P_RULE_0=@$(LOG_CXX) "$@"
--P_RULE_1A=$(_v)${KC++} -o $@ -c ${CXXFLAGS} ${filter-out ${$@_CFLAGS_RM}, ${CFLAGS} ${CXXWARNFLAGS}} -MD -MF $(@:o=d) -MP ${$@_CFLAGS_ADD} ${$@_CXXWARNFLAGS_ADD} ${INCFLAGS} ${$@_INCFLAGS}
-+P_RULE_1A=$(_v)${KC++} -o $@ -c ${CXXFLAGS} ${filter-out ${$@_CFLAGS_RM}, ${CFLAGS} ${CXXWARNFLAGS}} -MD -MF $(@:o=d) -MJ $(@:o=o.json) -MP ${$@_CFLAGS_ADD} ${$@_CXXWARNFLAGS_ADD} ${INCFLAGS} ${$@_INCFLAGS}
- P_RULE_1B=$(<F)
- P_RULE_2=
- 
 diff --git a/osfmk/arm64/proc_reg.h b/osfmk/arm64/proc_reg.h
 index 133b07f..d2f9e80 100644
 --- a/osfmk/arm64/proc_reg.h
@@ -176,10 +160,10 @@ index 133b07f..d2f9e80 100644
  /* I-Cache. */
 diff --git a/pexpert/pexpert/arm64/KEBAB.h b/pexpert/pexpert/arm64/KEBAB.h
 new file mode 100644
-index 0000000..fea4c94
+index 0000000..d9f0723
 --- /dev/null
 +++ b/pexpert/pexpert/arm64/KEBAB.h
-@@ -0,0 +1,69 @@
+@@ -0,0 +1,67 @@
 +/*
 + * Copyright (c) 2016 Apple Inc. All rights reserved.
 + */
@@ -190,9 +174,7 @@ index 0000000..fea4c94
 +#define NO_MONITOR 1
 +#define NO_ECORE 1
 +
-+#ifndef BCM2837
 +#define BCM2837
-+#endif
 +#define BCM2837_BRINGUP
 +#define ARM_ARCH_TIMER
 +
@@ -264,10 +246,10 @@ index 8226b8c..7e60eb0 100644
  
  # Headers installed into System.framework/PrivateHeaders (userspace internal SDK only).
 diff --git a/pexpert/pexpert/arm64/board_config.h b/pexpert/pexpert/arm64/board_config.h
-index 9454534..69199c2 100644
+index 9454534..7a2a35d 100644
 --- a/pexpert/pexpert/arm64/board_config.h
 +++ b/pexpert/pexpert/arm64/board_config.h
-@@ -97,6 +97,19 @@
+@@ -97,6 +97,16 @@
  #define CORE_NCTRS                     8 /* Placeholder; KPC is not enabled for this target */
  #endif  /* ARM64_BOARD_CONFIG_BCM2837 */
  
@@ -280,9 +262,6 @@ index 9454534..69199c2 100644
 +#define MAX_CPU_CLUSTERS               1
 +#define CORE_NCTRS                     8
 +#endif  /* ARM64_BOARD_CONFIG_KEBAB */
-+
-+/* kebab: OnePlus 8T / SM8250, built for a 16 KiB granule. */
-+
 +
  #ifdef ARM64_BOARD_CONFIG_VMAPPLE
  #include <pexpert/arm64/VMAPPLE.h>
