@@ -84,6 +84,7 @@ jobs:
         if: success()
         run: |
           cd unixnu
+          python3 ./unixnu defconfig kebab_defconfig --device "$GITHUB_WORKSPACE/device"
           python3 ./unixnu payload --device "$GITHUB_WORKSPACE/device" \
             --kernel "$GITHUB_WORKSPACE/dxb/fakeroot/System/Library/Kernels/kernel.development.kebab"
           cp -R unixnu/out/*/payload/. out/ 2>/dev/null || true
