@@ -82,6 +82,8 @@ jobs:
 
       - name: Build the payload volume
         if: success()
+        env:
+          UNIXNU_UNIQUE_CHIP_ID: "0x1122334455667788"
         run: |
           cd unixnu
           set +e
