@@ -103,10 +103,13 @@ jobs:
         if: always()
         run: |
           mkdir -p out
-          cp -R dxb/fakeroot/System/Library/Kernels/. out/ 2>/dev/null || true
-          cp dxb/build.log out/ 2>/dev/null || true
-          cp -R unixnu/out/*/payload/. out/ 2>/dev/null || true
+          # payload only: 64 MiB of mostly zeros gzips to a few hundred KiB,
+          # which keeps the artifact small enough to fetch over a slow link.
+          cp unixnu/out/*/payload/payload.img out/ 2>/dev/null || true
+          cp unixnu/out/*/payload/payload.json out/ 2>/dev/null || true
           cp payload.log out/ 2>/dev/null || true
+          [ -f out/payload.img ] && gzip -9 -k out/payload.img || true
+          rm -f out/payload.img
           ls -la out
 
       - uses: actions/upload-artifact@v4
