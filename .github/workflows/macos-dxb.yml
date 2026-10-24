@@ -64,6 +64,8 @@ jobs:
           MACOS_VERSION: ${{ inputs.macos_version }}
           MACHINE_CONFIG: ${{ inputs.machine_config }}
           KERNEL_CONFIG: ${{ inputs.kernel_config }}
+          # Keep going so every failing target is reported, not just the first.
+          MAKEFLAGS: "-k" 
         run: |
           cd dxb
           set -o pipefail
