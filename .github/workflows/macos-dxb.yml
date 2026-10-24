@@ -72,7 +72,8 @@ jobs:
       - name: Dump the first errors
         if: failure()
         run: |
-          grep -nE -B4 -m6 "error:|Error [0-9]" dxb/build.log | head -60 || true
+          echo "== install/compile failures"
+          grep -n -B25 'make: \*\*\* \[' dxb/build.log | head -80 || true
 
       - name: Collect
         if: always()
