@@ -80,12 +80,22 @@ jobs:
           echo "== install/compile failures"
           grep -n -B25 'make: \*\*\* \[' dxb/build.log | head -80 || true
 
+      - name: Build the payload volume
+        if: success()
+        run: |
+          cd unixnu
+          python3 ./unixnu payload --device "$GITHUB_WORKSPACE/device" \
+            --kernel "$GITHUB_WORKSPACE/dxb/fakeroot/System/Library/Kernels/kernel.development.kebab"
+          cp -R unixnu/out/*/payload/. out/ 2>/dev/null || true
+          ls -la out/*/payload/
+
       - name: Collect
         if: always()
         run: |
           mkdir -p out
           cp -R dxb/fakeroot/System/Library/Kernels/. out/ 2>/dev/null || true
           cp dxb/build.log out/ 2>/dev/null || true
+          cp -R unixnu/out/*/payload/. out/ 2>/dev/null || true
           ls -la out
 
       - uses: actions/upload-artifact@v4
