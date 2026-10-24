@@ -84,10 +84,14 @@ jobs:
         if: success()
         run: |
           cd unixnu
-          python3 ./unixnu defconfig kebab_defconfig --device "$GITHUB_WORKSPACE/device"
-          python3 ./unixnu build payload --device "$GITHUB_WORKSPACE/device"             --kernel "$GITHUB_WORKSPACE/dxb/fakeroot/System/Library/Kernels/kernel.development.kebab"
-          cp -R unixnu/out/*/payload/. out/ 2>/dev/null || true
-          ls -la out/*/payload/
+          set +e
+          python3 ./unixnu defconfig kebab_defconfig --device "$GITHUB_WORKSPACE/device" > ../payload.log 2>&1
+          python3 ./unixnu build payload --device "$GITHUB_WORKSPACE/device" \
+            --kernel "$GITHUB_WORKSPACE/dxb/fakeroot/System/Library/Kernels/kernel.development.kebab" >> ../payload.log 2>&1
+          rc=$?
+          cat ../payload.log
+          ls -la out/*/payload/ 2>/dev/null
+          exit $rc
 
       - name: Collect
         if: always()
@@ -96,6 +100,7 @@ jobs:
           cp -R dxb/fakeroot/System/Library/Kernels/. out/ 2>/dev/null || true
           cp dxb/build.log out/ 2>/dev/null || true
           cp -R unixnu/out/*/payload/. out/ 2>/dev/null || true
+          cp payload.log out/ 2>/dev/null || true
           ls -la out
 
       - uses: actions/upload-artifact@v4
