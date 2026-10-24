@@ -153,7 +153,11 @@ def build(ctx, kernel=None):
     (stage / 'EFI/UniXNU/unixnu.toml').write_text(
         f'version = 1\n[boot]\ntimeout = {spec.get("timeout", 3)}\ndefault = "xnu"\n[kits]\nautoload = false\n{loader}'
         f'[[entry]]\nid = "xnu"\ntitle = "{spec.get("title", "UniXNU")}"\ntype = "xnu"\npath = "Payloads/kernel.macho"\n{initrd}'
-        f'args = "{line}"\n')
+        f'args = "{line}"\n'
+        # Give the menu an explicit way out: without these the only actions are
+        # the ones the firmware itself offers.
+        '[[entry]]\nid = "reset"\ntitle = "Restart"\ntype = "action"\naction = "reset"\n'
+        '[[entry]]\nid = "shutdown"\ntitle = "Power off"\ntype = "action"\naction = "shutdown"\n')
     for path in [stage, *stage.rglob('*')]:
         os.utime(path, (EPOCH, EPOCH))
     size = int(spec.get('size_mib', 192))
