@@ -78,7 +78,9 @@ jobs:
         if: failure()
         run: |
           echo "== install/compile failures"
-          grep -n -B25 'make: \*\*\* \[' dxb/build.log | head -80 || true
+          errs=$(grep -nE -B4 -m4 "error:|Error [0-9]|No rule to make" dxb/build.log | grep -vE "patch (does not apply|failed)" | head -40)
+          echo "$errs"
+          printf '%s' "$errs" | tail -12 | tr '\n' '|' | cut -c1-900 | sed 's/^/::error title=build::/'
 
       - name: Build the payload volume
         if: success()
