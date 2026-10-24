@@ -66,7 +66,7 @@ index 76582da..170b726 100644
  	return dec;
  }
  
-+#if defined(NEGRONI)
++#if defined(NEGRONI) || defined(KEBAB)
 +/*
 + * negroni: arm_vm_init() calls this unconditionally; Apple's definition (it
 + * enters the PPL/monitor) ships only in the closed per-SoC library. There is
@@ -76,7 +76,7 @@ index 76582da..170b726 100644
 +ml_enable_monitor(void)
 +{
 +}
-+#endif /* NEGRONI */
++#endif /* NEGRONI || KEBAB */
 +
  boolean_t
  ml_get_timer_pending(void)
