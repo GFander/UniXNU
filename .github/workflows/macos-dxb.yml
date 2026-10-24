@@ -28,6 +28,8 @@ jobs:
   build:
     # Xcode 15.x: its iig matches the xnu-8796 IORPC ABI.
     runs-on: macos-14
+    permissions:
+      contents: write
     timeout-minutes: 180
     steps:
       - name: Check out UniXNU
@@ -115,6 +117,20 @@ jobs:
           [ -f out/payload.img ] && gzip -9 -k out/payload.img || true
           rm -f out/payload.img
           ls -la out
+
+      - name: Publish the payload for IDM
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # A release asset needs no auth, so a download manager can fetch it.
+          cd out 2>/dev/null || exit 0
+          [ -f payload.img.gz ] || exit 0
+          gh release view kebab-latest --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+            gh release create kebab-latest --repo "$GITHUB_REPOSITORY" \
+              --title "kebab bring-up payload" --notes "Latest kebab payload, overwritten on every build."
+          gh release upload kebab-latest payload.img.gz payload.json --repo "$GITHUB_REPOSITORY" --clobber
+          echo "https://github.com/$GITHUB_REPOSITORY/releases/download/kebab-latest/payload.img.gz"
 
       - uses: actions/upload-artifact@v4
         if: always()
