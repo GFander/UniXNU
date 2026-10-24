@@ -91,6 +91,10 @@ jobs:
           python3 ./unixnu build payload --device "$GITHUB_WORKSPACE/device" \
             --kernel "$GITHUB_WORKSPACE/dxb/fakeroot/System/Library/Kernels/kernel.development.kebab" >> ../payload.log 2>&1
           rc=$?
+          if [ $rc -ne 0 ]; then
+            msg=$(tail -6 ../payload.log | tr '\n' '|' | cut -c1-800)
+            echo "::error title=payload-failed::$msg"
+          fi
           cat ../payload.log
           ls -la out/*/payload/ 2>/dev/null
           exit $rc
