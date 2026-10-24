@@ -60,7 +60,7 @@ jobs:
           ls dxb/patches
 
       - name: Install host tools
-        run: brew install jq gum bash cmake ninja
+        run: brew install jq gum bash cmake ninja mtools dosfstools
 
       - name: Build kernel
         env:
