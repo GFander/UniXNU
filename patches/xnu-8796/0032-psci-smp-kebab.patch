@@ -1,77 +1,21 @@
 --- a/iokit/conf/files.arm64
 +++ b/iokit/conf/files.arm64
-@@ -6,5 +6,18 @@
- # SMP
- iokit/Kernel/arm/AppleARMSMP.cpp    					optional iokitcpp
+@@ -8,3 +8,4 @@
  
--# NEGRONI device-tree platform (empty translation unit on other boards)
--iokit/Kernel/arm/NegroniPlatformExpert.cpp                         optional iokitcpp
-+# KEBAB device-tree platform (empty translation unit on other boards)
-+iokit/Kernel/arm/KebabPlatformExpert.cpp                         optional iokitcpp
-+
-+iokit/Kernel/arm/KebabCPU.cpp                                    optional iokitcpp
-+iokit/Kernel/arm/KebabEntitlements.cpp                           optional iokitcpp
-+iokit/Kernel/arm/KebabKeyStore.cpp                               optional iokitcpp
-+iokit/Kernel/arm/KebabWatchdog.cpp                               optional iokitcpp
-+iokit/Kernel/arm/KebabSurface.cpp                                optional iokitcpp
-+iokit/Kernel/arm/KebabFramebuffer.cpp                            optional iokitcpp
-+iokit/Kernel/arm/KebabGPU.cpp                                    optional iokitcpp
-+iokit/Kernel/arm/KebabBattery.cpp                                optional iokitcpp
-+iokit/Kernel/arm/hid/KebabHID.cpp                                optional iokitcpp
-+iokit/Kernel/arm/hid/IOHIDEvent.cpp                              optional iokitcpp
-+iokit/Kernel/arm/hid/IOHIDEventServiceQueue.cpp                  optional iokitcpp
-+iokit/Kernel/arm/hid/IOHIDEventServiceUserClient.cpp             optional iokitcpp
+ # NEGRONI device-tree platform (empty translation unit on other boards)
+ iokit/Kernel/arm/NegroniPlatformExpert.cpp                         optional iokitcpp
++iokit/Kernel/arm/KebabCPU.cpp                                      optional iokitcpp
 --- a/iokit/KernelConfigTables.cpp
 +++ b/iokit/KernelConfigTables.cpp
-@@ -34,13 +34,49 @@
- 
- const char * gIOKernelConfigTables =
-     "("
--#if defined(ARM64_BOARD_CONFIG_NEGRONI)
-+#if defined(ARM64_BOARD_CONFIG_KEBAB)
-     "   {"
--    "     'IOClass'         = NegroniPlatformExpert;"
-+    "     'IOClass'         = KebabPlatformExpert;"
-     "     'IOProviderClass' = IOPlatformExpertDevice;"
--    "     'IONameMatch'     = 'oneplus,negroni';"
-+    "     'IONameMatch'     = 'oneplus,kebab';"
+@@ -41,6 +41,12 @@
+     "     'IONameMatch'     = 'oneplus,negroni';"
      "     'IOProbeScore'    = 10000:32;"
      "   },"
 +    "   {"
 +    "     'IOClass'         = KebabCPU;"
-+    "     'IOProviderClass' = IOPlatformDevice;"
-+    "     'IONameMatch'     = 'qcom,kryo470';"
-+    "     'IOProbeScore'    = 10000:32;"
-+    "   },"
-+    "   {"
-+    "     'IOClass'         = AppleKeyStore;"
-+    "     'IOProviderClass' = IOResources;"
-+    "     'IOMatchCategory' = AppleKeyStore;"
-+    "   },"
-+    "   {"
-+    "     'IOClass'         = IOWatchdog;"
-+    "     'IOProviderClass' = IOResources;"
-+    "     'IOMatchCategory' = IOWatchdog;"
-+    "   },"
-+    "   {"
-+    "     'IOClass'         = IOCoreSurfaceRoot;"
-+    "     'IOProviderClass' = IOResources;"
-+    "     'IOMatchCategory' = IOCoreSurfaceRoot;"
-+    "   },"
-+    "   {"
-+    "     'IOClass'         = AppleCLCD;"
-+    "     'IOProviderClass' = IOPlatformDevice;"
-+    "     'IONameMatch'     = 'kebab,display';"
-+    "   },"
-+    "   {"
-+    "     'IOClass'         = KebabHIDButtons;"
-+    "     'IOProviderClass' = IOResources;"
-+    "     'IOMatchCategory' = KebabHIDButtons;"
-+    "   },"
-+    "   {"
-+    "     'IOClass'         = KebabHIDTouch;"
-+    "     'IOProviderClass' = IOResources;"
-+    "     'IOMatchCategory' = KebabHIDTouch;"
++    "     'IOProviderClass' = IOPlatformExpertDevice;"
++    "     'IONameMatch'     = 'oneplus,kebab';"
++    "     'IOProbeScore'    = 9000:32;"
 +    "   },"
  #endif
      "   {"
@@ -630,3 +574,13 @@
  
  #if (!CONFIG_KERNEL_INTEGRITY || (CONFIG_KERNEL_INTEGRITY && !defined(KERNEL_INTEGRITY_WT)))
  	/* Watchtower
+--- a/pexpert/pexpert/arm64/KEBAB.h
++++ b/pexpert/pexpert/arm64/KEBAB.h
+@@ -29,6 +29,7 @@
+ 
+ #define HAS_GIC_V3                1
+ 
++#define KEBAB_SMP_MAX_CPUS         8
+ #define KEBAB_VTIMER_INTID       27      /* SM8250: architected virtual timer is PPI 11 */
+ #define KEBAB_IPI_SGI             1      /* SGI used for cross-CPU signals */
+ #define GIC_SPURIOUS_IRQ       1023
