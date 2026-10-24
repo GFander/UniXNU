@@ -48,6 +48,9 @@ jobs:
           git -C dxb fetch -q --depth 1 "$DXB_REPO" "$DXB_SHA"
           git -C dxb checkout -q FETCH_HEAD
           cp unixnu/patches/xnu-8796/*.patch dxb/patches/
+          # dxb already applies its own SDK-root and availability handling.
+          rm -f dxb/patches/0001-kernel-sdk-root.patch \
+                dxb/patches/0002-local-availability.patch
           echo "== patches"
           ls dxb/patches
 
@@ -61,7 +64,13 @@ jobs:
           KERNEL_CONFIG: ${{ inputs.kernel_config }}
         run: |
           cd dxb
+          set -o pipefail
           bash build.sh 2>&1 | tee build.log
+
+      - name: Dump the first errors
+        if: failure()
+        run: |
+          grep -nE -B4 -m6 "error:|Error [0-9]" dxb/build.log | head -60 || true
 
       - name: Collect
         if: always()
