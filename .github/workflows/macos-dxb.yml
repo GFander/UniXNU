@@ -53,6 +53,9 @@ jobs:
                 dxb/patches/0002-local-availability.patch \
                 dxb/patches/0021-pid-hibernate.patch \
                 dxb/patches/0022-json-compile-records.patch
+          # libfirehose_kernel is built arm64e-only; our kernel is plain arm64.
+          sed -i '' 's/ARCHS="x86_64 arm64e" VALID_ARCHS="x86_64 arm64e"/ARCHS="x86_64 arm64e arm64" VALID_ARCHS="x86_64 arm64e arm64"/' dxb/build.sh
+          grep -c 'VALID_ARCHS="x86_64 arm64e arm64"' dxb/build.sh
           echo "== patches"
           ls dxb/patches
 
