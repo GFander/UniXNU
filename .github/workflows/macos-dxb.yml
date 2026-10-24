@@ -47,7 +47,8 @@ jobs:
           git init -q dxb
           git -C dxb fetch -q --depth 1 "$DXB_REPO" "$DXB_SHA"
           git -C dxb checkout -q FETCH_HEAD
-          cp unixnu/patches/xnu-8796/*.patch dxb/patches/
+          # The patch set is device-specific and lives in the device repository.
+          cp device/patches/xnu-8796-kebab/*.patch dxb/patches/
           # dxb already applies its own SDK-root and availability handling.
           rm -f dxb/patches/0001-kernel-sdk-root.patch \
                 dxb/patches/0002-local-availability.patch \
