@@ -78,7 +78,7 @@ jobs:
         if: failure()
         run: |
           echo "== install/compile failures"
-          errs=$(grep -nE -B4 -m4 "error:|Error [0-9]|No rule to make" dxb/build.log | grep -vE "patch (does not apply|failed)" | head -40)
+          errs=$(grep -nE "error:|Error [0-9]|No rule to make" dxb/build.log | grep -vE "patch (does not apply|failed)|Skipping patch" | tail -12)
           echo "$errs"
           printf '%s' "$errs" | tail -12 | tr '\n' '|' | cut -c1-900 | sed 's/^/::error title=build::/'
 
@@ -110,6 +110,7 @@ jobs:
           cp unixnu/out/*/payload/payload.img out/ 2>/dev/null || true
           cp unixnu/out/*/payload/payload.json out/ 2>/dev/null || true
           cp payload.log out/ 2>/dev/null || true
+          gzip -9 -c dxb/build.log > out/build.log.gz 2>/dev/null || true
           [ -f out/payload.img ] && gzip -9 -k out/payload.img || true
           rm -f out/payload.img
           ls -la out
